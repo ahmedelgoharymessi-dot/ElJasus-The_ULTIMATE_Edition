@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استيراد قوائم الكلمات | El Jasus</title>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1535 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(15, 20, 35, 0.9);
+            border: 2px solid rgba(0, 242, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 900;
+            color: #00f2ff;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        p {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 900;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00f2ff, #7c30ff);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.6);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        .status.show {
+            display: block;
+        }
+        .status-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .success {
+            color: #22c55e;
+        }
+        .error {
+            color: #ef4444;
+        }
+        .pending {
+            color: #fbbf24;
+        }
+        .category-count {
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .count-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+        .count-label {
+            color: #aaa;
+        }
+        .count-value {
+            color: #00f2ff;
+            font-weight: 700;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 استيراد قوائم الكلمات</h1>
+        <p>سيتم استيراد جميع الفئات إلى Firebase تلقائياً</p>
+
+        <div class="category-count">
+            <div class="count-item">
+                <span class="count-label">📍 الأماكن</span>
+                <span class="count-value" id="count-places">0</span>
+            </div>
+            <div class="count-item">
+                <span class="count-label">⚽ فرق كرة القدم</span>
+                <span class="count-value" id="count-teams">0</span>
+            </div>
+            <div class="count-item">
+                <span class="count-label">🍕 الطعام</span>
+                <span class="count-value" id="count-food">0</span>
+            </div>
+            <div class="count-item">
+                <span class="count-label">💼 المهن</span>
+                <span class="count-value" id="count-jobs">0</span>
+            </div>
+            <div class="count-item">
+                <span class="count-label">🏢 الشركات</span>
+                <span class="count-value" id="count-companies">0</span>
+            </div>
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0, 242, 255, 0.2);">
+                <div class="count-item">
+                    <span class="count-label" style="font-weight: 900;">المجموع</span>
+                    <span class="count-value" style="font-size: 18px;" id="count-total">0</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" id="importBtn" onclick="importWords()">
+            <span id="btnText">🚀 ابدأ الاستيراد</span>
+        </button>
+
+        <div class="status" id="status">
+            <div id="statusContent"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+            authDomain: "el-jasus.firebaseapp.com",
+            databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "el-jasus",
+            appId: "1:415659587906:web:782f7940176ea4097eb0db"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Word lists data
+        const gameData = {
+            "الأماكن": [
+                "المدرسة", "المستشفى", "حديقة الحيوان", "المطار", "النادي", "السينما", "المطعم", "البحر", "المزرعة", "السيرك",
+                "المكتبة", "المسجد", "المحل", "الصيدلية", "البنك", "المحكمة", "السجن", "الغابة", "الصحراء",
+                "الجبل", "القلعة", "القصر", "الفندق", "المتحف", "المسرح", "المخبز", "المقهى (القهوة)", "السوبر ماركت", "محطة القطار",
+                "محطة المترو", "الورشة", "الاستاد", "الجيم", "الحضانة", "الجامعة", "صالون الحلاقة", "المعمل", "المنزل", "المطبخ",
+                "غرفة النوم", "الحمام", "السطوح", "الشارع", "الكوبري", "الميناء", "السفارة", "المرصد", "المخيم", "الشلال",
+                "البحيرة", "الكهف", "المسبح (البيسين)", "المصنع", "المكتب", "الأتوبيس", "الطيارة", "المركب", "الفضاء", "القمر",
+                "المريخ", "السوق", "الملاهي", "حديقة عامة", "الشقة", "الفيلا", "الخيمة", "الجراج", "المصلحة الحكومية", "البريد",
+                "قسم الشرطة", "المطافئ", "الإسعاف", "العيادة", "المول", "محل الموبايلات", "السايبر", "استوديو تصوير", "قاعة أفراح", "عزاء",
+                "معرض سيارات", "محل ورد", "محل هدايا", "كشك", "بنزينة", "موقف ميكروباصات", "مغسلة سيارات", "محل حلويات", "فرن عيش", "محل سمك",
+                "محل جزارة", "محل بقالة", "صالة بولينج", "تنس طاولة", "ملعب كورة", "البورصة", "المدبح", "الجزيرة", "المنارة", "المقابر"
+            ],
+
+            "فرق_كرة_القدم": [
+                "الأهلي المصري", "الزمالك", "الإسماعيلي", "المصري البورسعيدي", "الاتحاد السكندري", "بيراميدز", "سموحة", "مودرن فيوتشر", "المقاولون العرب", "غزل المحلة", "الجونة", "البنك الأهلي", "سيراميكا كليوباترا", "إنبي", "طلائع الجيش", "حرس الحدود", "أسوان",
+                "الهلال السعودي", "النصر السعودي", "الاتحاد السعودي", "الأهلي السعودي", "الشباب السعودي", "العين الإماراتي", "شباب الأهلي", "الوداد المغربي", "الرجاء المغربي", "الجيش الملكي", "الترجي التونسي", "النجم الساحلي", "الإفريقي التونسي", "السد القطري", "الدحيل", "الكويت الكويتي", "القادسية الكويتي", "الوحدات الأردني", "الزوراء العراقي",
+                "ليفربول", "مانشستر سيتي", "مانشستر يونايتد", "أرسنال", "تشيلسي", "توتنهام", "أستون فيلا", "نيوكاسل يونايتد", "ليستر سيتي", "وست هام",
+                "ريال مدريد", "برشلونة", "أتلتيكو مدريد", "إشبيلية", "فالنسيا", "ريال سوسيداد", "فياريال", "بيلباو",
+                "يوفنتوس", "إيه سي ميلان", "إنتر ميلان", "نابولي", "روما", "لاتسيو", "فيورنتينا", "بايرن ميونخ", "بوروسيا دورتموند", "باير ليفركوزن", "لايبزيج", "باريس سان جيرمان", "مارسيليا", "ليون", "موناكو", "أياكس أمستردام", "بنفيكا", "بورتو",
+                "منتخب مصر", "منتخب السعودية", "منتخب المغرب", "منتخب الجزائر", "منتخب تونس", "منتخب قطر", "منتخب البرازيل", "منتخب الأرجنتين", "منتخب فرنسا", "منتخب ألمانيا", "منتخب إسبانيا", "منتخب إيطاليا", "منتخب إنجلترا", "منتخب البرتغال", "منتخب بلجيكا", "منتخب كرواتيا", "منتخب هولندا", "منتخب الأوروغواي", "منتخب اليابان", "منتخب كوريا الجنوبية", "منتخب السنغال", "منتخب نيجيريا", "منتخب الكاميرون"
+            ],
+
+            "الطعام": [
+                "كشري", "ملوخية", "فول", "طعمية (فلافل)", "فتة باللحمة", "حواوشي", "محشي كرنب", "محشي ورق عنب", "ممبار", "كوارع",
+                "فتة كوارع", "كفتة مشوية", "طرب", "كباب", "كبدة إسكندراني", "سجق شرقي", "مكرونة بشاميل", "رقاق باللحمة", "جلاش", "أرز بلبن",
+                "أم علي", "بسبوسة", "كنافة", "لقيمات (قاضي)", "فطير مشلتت", "مش وجبنة قديمة", "عسل أسود وطحينة", "كشك", "بصارة", "عدس",
+                "شوربة لسان عصفور", "أرز معمر", "مسقعة", "تورلي خضار", "بامية باللحمة", "قلقاس", "سبانخ", "أرز بالشعرية", "فراخ محمرة", "حمام محشي",
+                "بط", "أرانب", "سمك بلطي", "سمك بوري", "جمبري", "سبيط", "فسيخ", "رنجة", "ملوحة", "بطاطس محمرة","بابا غنوج", "سلطة خضراء", "مخلل (طرشي)",
+                "باذنجان مخلل", "بيض بالبسطرمة", "شكشوكة", "عجة", "مخ بانيه", "كبدة وقوانص", "كفتة",
+                "كفتة أرز", "أرز صيادية", "كيكة برتقال", "رز بلبن", "مهلبية", "قمر الدين", "عاشورا", "زلابيا", "بلح الشام", "صوابع زينب",
+                "كحك العيد", "بسكويت نشادر", "غريبة", "بيتيفور", "منين (قراقيش)", "قرص بعجوة", "عيش بلدي", "عيش فينو", "شاورما مصري", "فراخ بانيه",
+                "صينية بطاطس", "مكرونة بالصلصة", "ساندوتش جبنة", "شاي بلبن", "سحلب", "عصير قصب", "عرقسوس", "تمرهندي", "خروب", "سوبيا",
+                "مدمس", "بيض مسلوق", "جبنة بيضا", "لانشون", "بسطرمة", "مخروطة", "كوسة بالبشاميل", "أرز بالخلطة", "كبدة جملي", "فريك"
+            ],
+
+            "المهن": [
+                "دكتور", "مهندس", "مدرس", "ضابط", "محامي", "محاسب", "ممرض", "صيدلي", "طيار", "سواق",
+                "نجار", "سباك", "كهربائي", "نقاش", "بنا", "ميكانيكي", "حلاق", "خياط", "طباخ", "جزار",
+                "بائع", "صحفي", "مذيع", "ممثل", "مغني", "رسام", "مصور", "لاعب كورة", "مدرب", "حكم",
+                "عامل نظافة", "بواب", "عامل دليفري", "نجار مسلح", "حداد", "فلاح", "صياد", "قاضي", "رجل إطفاء", "عسكري",
+                "مأذون", "إمام مسجد", "قسيس", "مألف", "شاعر", "مخرج", "مونتير", "مصمم جرافيك", "مبرمج", "هكر",
+                "عالم", "رائد فضاء", "غطاس", "طيار حربي", "مضيفة طيران", "مترجم", "سكرتير", "مدير", "وزير", "رئيس",
+                "خبير تجميل", "موديل", "يوتيوبر", "تيكتوكر", "بلوجر", "عامل بنزينة", "صراف", "جرسون", "شيف", "حلواني",
+                "خفير", "بودي جارد", "محقق", "جاسوس", "رجل أعمال", "بائع خضار", "بائع فاكهة", "بائع لبن", "مكوجي", "منجد",
+                "عامل بناء", "فني تكييف", "فني راديو", "ساحر", "مهرج", "راقص", "مدرب جيم", "سباح محترف", "عامل منجم", "عامل شحن",
+                "ساعي بريد", "موظف استقبال", "طبيب بيطري", "طبيب أسنان", "طبيب عيون", "محلل كورة", "سمسار", "تاجر", "مقاول", "طيار درون"
+            ],
+
+            "الشركات": [
+                "Apple", "Google", "Microsoft", "Amazon", "Facebook", "Instagram", "WhatsApp", "YouTube", "TikTok", "Netflix",
+                "Samsung", "Huawei", "Xiaomi", "Oppo", "Sony", "LG", "Dell", "HP", "Intel", "Canon",
+                "Tesla", "Toyota", "Mercedes", "BMW", "Audi", "Ferrari", "Lamborghini", "Ford", "Chevrolet", "Jeep",
+                "Nike", "Adidas", "Puma", "Zara", "H&M", "Gucci", "Prada", "Rolex", "Lacoste", "Chanel",
+                "McDonald's", "KFC", "Burger King", "Pizza Hut", "Subway", "Starbucks", "Pepsi", "Coca-Cola", "Red Bull", "KitKat",
+                "Disney", "Marvel", "DC Comics", "Warner Bros", "Paramount", "Pixar", "Universal", "Spotify", "Snapchat", "Telegram",
+                "Visa", "Mastercard", "PayPal", "Binance", "Amazon", "eBay", "Alibaba", "AliExpress", "Shein", "Noon",
+                "Uber", "Careem", "Airbnb", "Booking", "FedEx", "DHL", "Aramex", "IKEA", "Walmart", "Carrefour",
+                "Nestle", "Dove", "Nivea", "L'Oreal", "Johnson's", "Colgate", "Gillette", "Rolex", "Casio", "Nikon",
+                "Lego", "Barbie", "Hot Wheels", "PlayStation", "Xbox", "Nintendo", "Zoom", "Skype", "Slack", "LinkedIn"
+            ]
+        };
+
+        // Display counts on page load
+        document.getElementById('count-places').textContent = gameData['الأماكن'].length + ' كلمة';
+        document.getElementById('count-teams').textContent = gameData['فرق_كرة_القدم'].length + ' فريق';
+        document.getElementById('count-food').textContent = gameData['الطعام'].length + ' أكلة';
+        document.getElementById('count-jobs').textContent = gameData['المهن'].length + ' مهنة';
+        document.getElementById('count-companies').textContent = gameData['الشركات'].length + ' شركة';
+        
+        const total = Object.values(gameData).reduce((sum, arr) => sum + arr.length, 0);
+        document.getElementById('count-total').textContent = total + ' كلمة';
+
+        // Import function
+        window.importWords = async function() {
+            const btn = document.getElementById('importBtn');
+            const btnText = document.getElementById('btnText');
+            const status = document.getElementById('status');
+            const statusContent = document.getElementById('statusContent');
+
+            btn.disabled = true;
+            btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الاستيراد...';
+            status.classList.add('show');
+            statusContent.innerHTML = '';
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const [category, words] of Object.entries(gameData)) {
+                const statusItem = document.createElement('div');
+                statusItem.className = 'status-item pending';
+                statusItem.innerHTML = `
+                    <span>${category}</span>
+                    <span id="status-${category.replace(/\s+/g, '_')}">⏳ جاري...</span>
+                `;
+                statusContent.appendChild(statusItem);
+
+                try {
+                    await set(ref(db, `wordLists/${category}`), words);
+                    document.getElementById(`status-${category.replace(/\s+/g, '_')}`).innerHTML = '✅ تم';
+                    statusItem.className = 'status-item success';
+                    successCount++;
+                    
+                    // Small delay to avoid rate limiting
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                } catch (error) {
+                    console.error(`Error importing ${category}:`, error);
+                    document.getElementById(`status-${category.replace(/\s+/g, '_')}`).innerHTML = '❌ فشل';
+                    statusItem.className = 'status-item error';
+                    errorCount++;
+                }
+            }
+
+            // Final status
+            if (errorCount === 0) {
+                btnText.innerHTML = '✅ تم الاستيراد بنجاح!';
+                btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+                
+                setTimeout(() => {
+                    alert(`🎉 تم استيراد ${successCount} فئة بنجاح!\n\nإجمالي الكلمات: ${total}\n\nيمكنك الآن إغلاق هذه الصفحة والذهاب لـ admin.html للتحقق.`);
+                }, 500);
+            } else {
+                btnText.innerHTML = '⚠️ اكتمل مع أخطاء';
+                btn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                alert(`⚠️ تم استيراد ${successCount} فئة بنجاح\nفشل ${errorCount} فئة\n\nتحقق من console للتفاصيل.`);
+            }
+
+            btn.disabled = false;
+        };
+
+        // Make functions available globally
+        window.gameData = gameData;
+        window.db = db;
+        window.ref = ref;
+        window.set = set;
+    </script>
+</body>
+</html>
