@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="الجاسوس">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | El Jasus</title>
+    <link rel="icon" type="image/png" href="ElJasus2.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1535 50%, #0f0c1d 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .logo-section img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #00f2ff;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
+            margin-bottom: 20px;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .logo-section h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #00f2ff, #7c30ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
+        }
+
+        .logo-section p {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: #00f2ff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.8;
+        }
+
+        /* Glass Login Box */
+        .login-box {
+            background: linear-gradient(135deg, rgba(15, 20, 35, 0.9), rgba(25, 30, 50, 0.8));
+            backdrop-filter: blur(20px);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, rgba(0, 242, 255, 0.3), rgba(124, 48, 255, 0.3)) 1;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 30px rgba(0, 242, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(0, 242, 255, 0.05),
+                transparent
+            );
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .login-box h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 30px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+        }
+
+        .login-box h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #00f2ff, #7c30ff);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 242, 255, 0.05);
+            border: 2px solid rgba(0, 242, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            background: rgba(0, 242, 255, 0.1);
+            border-color: #00f2ff;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Custom Checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-container input {
+            display: none;
+        }
+
+        .custom-checkbox {
+            width: 22px;
+            height: 22px;
+            background: rgba(0, 242, 255, 0.1);
+            border: 2px solid rgba(0, 242, 255, 0.3);
+            border-radius: 6px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-container:hover .custom-checkbox {
+            border-color: #00f2ff;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+        }
+
+        .checkbox-container input:checked + .custom-checkbox {
+            background: linear-gradient(135deg, #00f2ff, #7c30ff);
+            border-color: #00f2ff;
+        }
+
+        .custom-checkbox::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .checkbox-container input:checked + .custom-checkbox::after {
+            opacity: 1;
+        }
+
+        .checkbox-label {
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00f2ff, #7c30ff);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover::before {
+            width: 300%;
+            height: 300%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.6);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.3), transparent);
+        }
+
+        .divider span {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Social Login */
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .social-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-btn img {
+            width: 28px;
+            height: 28px;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #00f2ff;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 242, 255, 0.3);
+        }
+
+        /* Footer Links */
+        .footer-links {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .footer-links a {
+            color: #00f2ff;
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #7c30ff;
+            text-decoration: underline;
+        }
+
+        /* Return Home Button with Animated Border */
+        .return-home-btn {
+            margin-top: 30px;
+            padding: 15px 30px;
+            width: 100%;
+            max-width: 300px;
+            height: 65px;
+            border: none;
+            outline: none;
+            color: #fff;
+            background: #0a0e1a;
+            cursor: pointer;
+            position: relative;
+            z-index: 0;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 900;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .return-home-btn::before {
+            content: '';
+            background: linear-gradient(45deg, 
+                #00d4ff, #0099ff, #0066ff, #0033ff, 
+                #3300ff, #6600ff, #9900ff, #cc00ff,
+                #00d4ff);
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            background-size: 400%;
+            z-index: -1;
+            filter: blur(6px);
+            width: calc(100% + 6px);
+            height: calc(100% + 6px);
+            animation: glowingBorder 8s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 15px;
+        }
+
+        .return-home-btn:hover::before {
+            opacity: 1;
+        }
+
+        .return-home-btn::after {
+            z-index: -1;
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0e1a, #1a1535);
+            left: 0;
+            top: 0;
+            border-radius: 15px;
+        }
+
+        @keyframes glowingBorder {
+            0% { background-position: 0 0; }
+            50% { background-position: 400% 0; }
+            100% { background-position: 0 0; }
+        }
+
+        .return-home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .return-home-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <img src="ElJasus2.png" alt="El Jasus Logo">
+            <h1>EL-JASUS</h1>
+            <p>The Ultimate Edition</p>
+        </div>
+
+        <!-- Login Box -->
+        <div class="login-box">
+            <h2>تسجيل الدخول</h2>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="username" placeholder="name@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+
+                <label class="checkbox-container">
+                    <input type="checkbox" id="forgot_password">
+                    <span class="custom-checkbox"></span>
+                    <span class="checkbox-label">ابقني مسجلاً</span>
+                </label>
+
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    <span style="position: relative; z-index: 1;">تسجيل الدخول</span>
+                </button>
+
+                <div class="divider">
+                    <span>أو</span>
+                </div>
+
+                <div class="social-login">
+                    <a href="#" class="social-btn google-official">
+                        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAPDxAPDRIQDw8PEA4PDhAQDxAPEQ8PFRIWFhURFRcYHSggGBolGxMWIzEiJSkrOjouFx8zOzMtNygtLisBCgoKDg0OGhAQGjAlHyYrLS0rMistLS0wNy0tLi0tKy0rLy0rListNy0tLS0uLS0tLS0tLS0tLS0tLSstLS0tLv/AABEIAOMA3gMBEQACEQEDEQH/xAAbAAEAAQUBAAAAAAAAAAAAAAAAAQIDBAUGB//EAEQQAAICAAIFBgoHBgYDAAAAAAABAgMEEQUGMUFREhMiYXGBIzJSU2KRkqGxwQcUQ5Hy0eE0c6Ky0vAkM0NCg/EUY8L/xAAcAQEAAgMBAQEAAAAAAAAAAAAAAgMBBAUGBwj/xAA5EQACAQICBQsCBgMAAwEAAAAAAQIDBBExBRIhQdEVUVJhcYGRobHB8BMiMjM0QuHxBhRiQ3LSJP/aAAwDAQACEQMRAD8A9xAAAAAAAAANPpLWfCYfNTtU5r7lf2ks+Cy6E+1opncU48s6Fvoy5rbYxwXO9n99xzeN+kGXSsPQlwldLP1xj/Ua8rzorxOvR/x5f+WfhxfA0mJ1vx1n+rza4VwhFetpv3lLuaj3nRp6ItIfsx7W/wCvI1tulMTPx775dt1mXqzyKnUm82zbja0I5Qj4IxpWyfjSk+2TZjFlyjFZIhSa2NrsbMGWky9Xjro+LbbH8Ns4/BklKS3lcqFKWcE+5Gfh9ZMbX4uIsf42rf50yxVqi3mrU0baTzpru2emBt8Hr5iY/wCbCq1dXKqk+9Zr3F0bqW9GhV0DQl+CTXnw9ToMBrxhbMlby6JekuVDP8UfmkXxuYPPYcuvoS4hthhJdWfg/bE6PD6wYW zKXKhn+KPzSL43MHnsOXX0JcQ2wwkurPwftiX8Nr/c98rJvhyYL48/8TSVttOE7vqOzvz3L/TXmdVhNZsBflyttobt50cqPtRzXvLVBrNHLq2tel+ODXn5rYYGZg1sSTIIABIwQZAMgrqrlN8mCc5PZGKcm+5BGYxcnhFY9hucDqljbsvsuai/vXPm8v9vje4tUWb1LRlzU/bh27P58jp9Gag1RyeKsla/IhnXDsb8Z+4mkdahoSnHbVePkuPodXhMJXTHkUwjXFboxSXa+LJHYp04U1qwWC6i+CYAAAAAAAAAAAAAAAAAAAAAAAAAMPFaLw9vTbTVN8ZVxb9eWZFxTzRTUt6VT8cU+1Gm0jqrglHlKlJ9VlqXqUsiEqceY0qujbbDHU83xOTxui6YvKMMv9838ylpHKq2lJPYvN8TGqwFT2x/il+YRVG2pvd5s6HRWruEsa5def/JavhItjFM6NHR9vLOPm+J0dGrOCh4uHqf407P5syzUjzHQho+2jlBd+31NnTTGCyhGMFwjFRXqRLA2oxUVglgVgkAAAAAAAAAAAAAD/9k=" alt="Google Logo">
+                    </a>
+                </div>
+
+                <div class="footer-links">
+                    ليس لديك حساب؟ <a href="signup.html">أنشئ واحداً الآن</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Return Home Button -->
+        <a href="index.html" class="return-home-btn">
+            <i class="fas fa-home"></i>
+            العودة للرئيسية
+        </a>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+            authDomain: "el-jasus.firebaseapp.com",
+            databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "el-jasus",
+            storageBucket: "el-jasus.firebasestorage.app",
+            messagingSenderId: "415659587906",
+            appId: "1:415659587906:web:782f7940176ea4097eb0db",
+            measurementId: "G-N4K79FP56N"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const keepSignedIn = document.getElementById('forgot_password').checked;
+            const loginBtn = document.getElementById('loginBtn');
+
+            // Validation
+            if (!email) {
+                alert('الرجاء إدخال البريد الإلكتروني');
+                return;
+            }
+
+            if (!password) {
+                alert('الرجاء إدخال كلمة المرور');
+                return;
+            }
+
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('الرجاء إدخال بريد إلكتروني صحيح');
+                return;
+            }
+
+            loginBtn.innerHTML = '<span style="position: relative; z-index: 1;">جاري التحقق...</span>';
+            loginBtn.disabled = true;
+
+            const persistence = keepSignedIn ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
+
+            auth.setPersistence(persistence)
+                .then(() => {
+                    return auth.signInWithEmailAndPassword(email, password);
+                })
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    const userName = user.displayName || "Agent";
+                    
+                    localStorage.setItem('eljasus_user_name', userName);
+                    localStorage.setItem('eljasus_user_email', user.email);
+                    
+                    // Daily login reward
+                    const uid = user.uid;
+                    const today = new Date().toDateString();
+                    const lastLogin = localStorage.getItem('eljasus_last_login');
+                    if (lastLogin !== today) {
+                        localStorage.setItem('eljasus_last_login', today);
+                        // Award 10 coins for daily login
+                        import("https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js").then(async ({getDatabase, ref, get, update}) => {
+                            try {
+                                const db   = getDatabase();
+                                const snap = await get(ref(db, `players/${uid}/coins`));
+                                const curr = snap.val() || 0;
+                                await update(ref(db, `players/${uid}`), { coins: curr + 10, lastDailyLogin: Date.now() });
+                                localStorage.setItem('eljasus_daily_reward', '10');
+                            } catch(e) {}
+                        });
+                    }
+                    window.location.href = "index.html"; 
+                })
+                .catch((error) => {
+                    console.error('Login Error:', error);
+                    
+                    let errorMessage = '';
+                    
+                    switch(error.code) {
+                        case 'auth/invalid-login-credentials':
+                        case 'auth/wrong-password':
+                            errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+                            break;
+                        case 'auth/user-not-found':
+                            errorMessage = 'لا يوجد حساب بهذا البريد الإلكتروني. يرجى إنشاء حساب جديد';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = 'البريد الإلكتروني غير صالح';
+                            break;
+                        case 'auth/user-disabled':
+                            errorMessage = 'هذا الحساب معطل';
+                            break;
+                        case 'auth/too-many-requests':
+                            errorMessage = 'تم حظر الحساب مؤقتاً بسبب محاولات دخول كثيرة. حاول لاحقاً';
+                            break;
+                        default:
+                            errorMessage = 'فشل تسجيل الدخول: ' + error.message;
+                    }
+                    
+                    alert(errorMessage);
+                    loginBtn.innerHTML = '<span style="position: relative; z-index: 1;">تسجيل الدخول</span>';
+                    loginBtn.disabled = false;
+                });
+        });
+
+        // Google Login
+        document.addEventListener('DOMContentLoaded', function() {
+            const googleLoginBtn = document.querySelector('.google-official');
+            
+            if (googleLoginBtn) {
+                googleLoginBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const googleProvider = new firebase.auth.GoogleAuthProvider();
+                    
+                    auth.signInWithPopup(googleProvider)
+                        .then((result) => {
+                            if (result.user && result.user.displayName) {
+                                localStorage.setItem('eljasus_user_name', result.user.displayName);
+                                localStorage.setItem('eljasus_user_email', result.user.email);
+                            }
+                            
+                            window.location.href = "index.html";
+                        })
+                        .catch(err => {
+                            alert("فشل تسجيل الدخول عبر Google: " + err.message);
+                        });
+                });
+            }
+        });
+    </script>
+    <link rel="stylesheet" href="mobile.css">
+    <script src="sound-system.js" defer></script>
+    <script src="qr-notifications.js" defer></script>
+    <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('[SW] Registered'))
+                .catch(err => console.log('[SW] Error', err));
+        });
+    }
+    </script>
+</body>
+</html>

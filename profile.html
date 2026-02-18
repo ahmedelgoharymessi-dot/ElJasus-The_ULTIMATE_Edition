@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="الجاسوس">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي | El Jasus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="ElJasus2.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="animations.css">
+    
+    <style>
+        :root { 
+            --bg-color: #0a0e1a;
+            --primary-color: #00f2ff;
+            --secondary-color: #7c30ff;
+        }
+        
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1535 50%, #0f0c1d 100%);
+            background-attachment: fixed;
+            color: #ffffff; 
+            min-height: 100vh; 
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+        
+        .glass { 
+            background: linear-gradient(135deg, rgba(15, 20, 35, 0.9), rgba(25, 30, 50, 0.8));
+            backdrop-filter: blur(20px);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, rgba(0, 242, 255, 0.3), rgba(124, 48, 255, 0.3)) 1;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 30px rgba(0, 242, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 242, 255, 0.05), transparent);
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .neon-text {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.8), 0 0 20px rgba(0, 242, 255, 0.6);
+        }
+
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 242, 255, 0.3);
+        }
+
+        .progress-bar {
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f2ff, #7c30ff);
+            border-radius: 10px;
+            transition: width 1s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+            <a href="account.html" class="flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-all hover:translate-x-1">
+                <i class="fas fa-arrow-right text-xl"></i>
+                <span class="text-sm font-bold">رجوع</span>
+            </a>
+            
+            <div class="text-center flex-1">
+                <h1 class="text-3xl font-black uppercase tracking-tight neon-text">الملف الشخصي</h1>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1" style="font-family: 'Orbitron', sans-serif;">PLAYER PROFILE</p>
+            </div>
+
+            <div class="w-20"></div>
+        </div>
+
+        <!-- Player Header -->
+        <div class="glass rounded-3xl p-8 mb-6 animate__animated animate__fadeIn">
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <!-- Avatar & Rank Badge -->
+                <div class="relative">
+                    <div class="w-40 h-40 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center border-4 border-cyan-500/30 glow-pulse">
+                        <i class="fas fa-user text-7xl text-white"></i>
+                    </div>
+                    <div id="rankBadge" class="absolute -bottom-2 -right-2 px-4 py-2 rounded-full text-xs font-black uppercase border-2 rank-bronze">
+                        BRONZE
+                    </div>
+                </div>
+
+                <!-- Player Info -->
+                <div class="flex-1 text-center md:text-right">
+                    <h2 id="playerUsername" class="text-5xl font-black neon-text mb-2">Loading...</h2>
+                    <div class="flex items-center justify-center md:justify-start gap-4 mb-4">
+                        <span id="playerRank" class="text-gray-400 text-sm">Bronze · Division III</span>
+                        <span class="w-1 h-1 bg-gray-600 rounded-full"></span>
+                        <span id="playerPoints" class="text-cyan-400 font-bold" style="font-family: 'Orbitron', sans-serif;">0 نقطة</span>
+                    </div>
+                    
+                    <!-- Rank Progress -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-gray-400">التقدم للرتبة التالية</span>
+                            <span id="rankProgress" class="text-cyan-400 font-bold">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="rankProgressBar" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gradient-to-br from-cyan-500/20 to-cyan-500/10 border-2 border-cyan-500/30 rounded-xl p-3">
+                            <p class="text-[10px] text-gray-400 uppercase mb-1">المستوى</p>
+                            <p id="playerLevel" class="text-3xl font-black text-cyan-400" style="font-family: 'Orbitron', sans-serif;">1</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-500/20 to-green-500/10 border-2 border-green-500/30 rounded-xl p-3">
+                            <p class="text-[10px] text-gray-400 uppercase mb-1">سلسلة الانتصارات</p>
+                            <p id="winStreak" class="text-3xl font-black text-green-400" style="font-family: 'Orbitron', sans-serif;">0</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-yellow-500/20 to-yellow-500/10 border-2 border-yellow-500/30 rounded-xl p-3">
+                            <p class="text-[10px] text-gray-400 uppercase mb-1">الإنجازات</p>
+                            <p id="achievementCount" class="text-3xl font-black text-yellow-400" style="font-family: 'Orbitron', sans-serif;">0/7</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            
+            <!-- Win/Loss Ratio -->
+            <div class="glass rounded-2xl p-6 stat-card animate__animated animate__fadeIn">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-lg bg-purple-500/20 border-2 border-purple-500/30 flex items-center justify-center">
+                        <i class="fas fa-chart-line text-purple-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-black">نسبة الفوز/الخسارة</h3>
+                </div>
+                <p id="winLossRatio" class="text-4xl font-black neon-text mb-2" style="font-family: 'Orbitron', sans-serif;">0.00</p>
+                <div class="flex justify-between text-sm text-gray-400">
+                    <span id="totalWins">فوز: 0</span>
+                    <span id="totalLosses">خسارة: 0</span>
+                </div>
+            </div>
+
+            <!-- Average Discussion Time -->
+            <div class="glass rounded-2xl p-6 stat-card animate__animated animate__fadeIn animate-delay-1">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/20 border-2 border-blue-500/30 flex items-center justify-center">
+                        <i class="fas fa-clock text-blue-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-black">متوسط وقت النقاش</h3>
+                </div>
+                <p id="avgDiscussionTime" class="text-4xl font-black neon-text mb-2" style="font-family: 'Orbitron', sans-serif;">0:00</p>
+                <p class="text-sm text-gray-400">لكل مباراة</p>
+            </div>
+
+            <!-- Spy Detection Rate -->
+            <div class="glass rounded-2xl p-6 stat-card animate__animated animate__fadeIn animate-delay-2">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-lg bg-green-500/20 border-2 border-green-500/30 flex items-center justify-center">
+                        <i class="fas fa-crosshairs text-green-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-black">معدل كشف الجاسوس</h3>
+                </div>
+                <p id="spyDetectionRate" class="text-4xl font-black neon-text mb-2" style="font-family: 'Orbitron', sans-serif;">0%</p>
+                <p class="text-sm text-gray-400">نسبة الكشف الصحيح</p>
+            </div>
+
+            <!-- Times Caught as Spy -->
+            <div class="glass rounded-2xl p-6 stat-card animate__animated animate__fadeIn animate-delay-3">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-lg bg-red-500/20 border-2 border-red-500/30 flex items-center justify-center">
+                        <i class="fas fa-user-secret text-red-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-black">مرات القبض كجاسوس</h3>
+                </div>
+                <p id="timesCaught" class="text-4xl font-black neon-text mb-2" style="font-family: 'Orbitron', sans-serif;">0</p>
+                <p class="text-sm text-gray-400">من إجمالي <span id="spyGames">0</span> مباراة كجاسوس</p>
+            </div>
+
+            <!-- Longest Win Streak -->
+            <div class="glass rounded-2xl p-6 stat-card animate__animated animate__fadeIn animate-delay-4">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-lg bg-orange-500/20 border-2 border-orange-500/30 flex items-center justify-center">
+                        <i class="fas fa-fire text-orange-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-black">أطول سلسلة انتصارات</h3>
+                </div>
+                <p id="longestStreak" class="text-4xl font-black neon-text mb-2" style="font-family: 'Orbitron', sans-serif;">0</p>
+                <p class="text-sm text-gray-400">انتصارات متتالية</p>
+            </div>
+
+            <!-- Favorite Category -->
+            <div class="glass rounded-2xl p-6 stat-card animate__animated animate__fadeIn animate-delay-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-lg bg-yellow-500/20 border-2 border-yellow-500/30 flex items-center justify-center">
+                        <i class="fas fa-star text-yellow-400 text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-black">الفئة المفضلة</h3>
+                </div>
+                <p id="favoriteCategory" class="text-2xl font-black neon-text mb-2">---</p>
+                <p class="text-sm text-gray-400"><span id="categoryCount">0</span> مباراة</p>
+            </div>
+        </div>
+
+        <!-- Achievements Section -->
+        <div class="glass rounded-3xl p-8 mb-6 animate__animated animate__fadeIn">
+            <h2 class="text-2xl font-black neon-text mb-6 flex items-center gap-3">
+                <i class="fas fa-trophy text-yellow-400"></i>
+                الإنجازات
+            </h2>
+            
+            <div id="achievementsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Achievements will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Category Stats -->
+        <div class="glass rounded-3xl p-8 animate__animated animate__fadeIn">
+            <h2 class="text-2xl font-black neon-text mb-6 flex items-center gap-3">
+                <i class="fas fa-chart-bar text-cyan-400"></i>
+                إحصائيات الفئات
+            </h2>
+            
+            <div id="categoryStats" class="space-y-4">
+                <!-- Category stats will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+        import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+            authDomain: "el-jasus.firebaseapp.com",
+            databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "el-jasus",
+            appId: "1:415659587906:web:782f7940176ea4097eb0db"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Load particle system
+        const script = document.createElement('script');
+        script.src = 'particles.js';
+        document.head.appendChild(script);
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadProfile(user.uid);
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        async function loadProfile(uid) {
+            const userRef = ref(db, `players/${uid}`);
+            const snapshot = await get(userRef);
+            
+            if (!snapshot.exists()) {
+                // Initialize default stats
+                await initializeDefaultStats(uid);
+                await loadProfile(uid);
+                return;
+            }
+
+            const data = snapshot.val();
+            const stats = data.stats || {};
+            const rank = data.rank || { tier: 'Bronze', points: 0 };
+            const achievements = data.achievements || {};
+            const categoryStats = data.categoryStats || {};
+
+            // Display username
+            document.getElementById('playerUsername').innerText = data.username || 'Player';
+
+            // Calculate and display rank
+            const rankInfo = calculateRank(rank.points);
+            displayRank(rankInfo, rank.points);
+
+            // Display stats
+            displayStats(stats);
+
+            // Display achievements
+            displayAchievements(achievements);
+
+            // Display category stats
+            displayCategoryStats(categoryStats);
+        }
+
+        function calculateRank(points) {
+            const ranks = [
+                { name: 'Bronze', min: 0, max: 999, class: 'rank-bronze' },
+                { name: 'Silver', min: 1000, max: 2499, class: 'rank-silver' },
+                { name: 'Gold', min: 2500, max: 4999, class: 'rank-gold' },
+                { name: 'Platinum', min: 5000, max: 9999, class: 'rank-platinum' },
+                { name: 'Diamond', min: 10000, max: Infinity, class: 'rank-diamond' }
+            ];
+
+            return ranks.find(r => points >= r.min && points <= r.max) || ranks[0];
+        }
+
+        function displayRank(rankInfo, points) {
+            const badge = document.getElementById('rankBadge');
+            badge.className = `absolute -bottom-2 -right-2 px-4 py-2 rounded-full text-xs font-black uppercase border-2 ${rankInfo.class}`;
+            badge.innerText = rankInfo.name;
+
+            document.getElementById('playerRank').innerText = `${rankInfo.name} · Division I`;
+            document.getElementById('playerPoints').innerText = `${points} نقطة`;
+
+            // Calculate progress
+            const progress = ((points - rankInfo.min) / (rankInfo.max - rankInfo.min)) * 100;
+            document.getElementById('rankProgress').innerText = `${Math.min(progress, 100).toFixed(1)}%`;
+            document.getElementById('rankProgressBar').style.width = `${Math.min(progress, 100)}%`;
+
+            // Calculate level
+            const level = Math.floor(points / 100) + 1;
+            document.getElementById('playerLevel').innerText = level;
+        }
+
+        function displayStats(stats) {
+            const totalWins = (stats.spyWins || 0) + (stats.innocentWins || 0);
+            const totalGames = stats.totalGames || 0;
+            const totalLosses = totalGames - totalWins;
+            const winLossRatio = totalLosses > 0 ? (totalWins / totalLosses).toFixed(2) : totalWins.toFixed(2);
+
+            document.getElementById('winLossRatio').innerText = winLossRatio;
+            document.getElementById('totalWins').innerText = `فوز: ${totalWins}`;
+            document.getElementById('totalLosses').innerText = `خسارة: ${totalLosses}`;
+
+            // Average discussion time
+            const avgTime = stats.averageDiscussionTime || 0;
+            const minutes = Math.floor(avgTime / 60);
+            const seconds = avgTime % 60;
+            document.getElementById('avgDiscussionTime').innerText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            // Spy detection rate
+            const detectionRate = stats.spyDetectionRate || 0;
+            document.getElementById('spyDetectionRate').innerText = `${detectionRate}%`;
+
+            // Times caught as spy
+            document.getElementById('timesCaught').innerText = stats.timesCaughtAsSpy || 0;
+            document.getElementById('spyGames').innerText = stats.spyWins || 0;
+
+            // Win streak
+            document.getElementById('winStreak').innerText = stats.currentStreak || 0;
+            document.getElementById('longestStreak').innerText = stats.longestWinStreak || 0;
+        }
+
+        function displayAchievements(achievements) {
+            const achievementsList = document.getElementById('achievementsList');
+            const allAchievements = {
+                firstWin: { name: 'الفوز الأول', icon: '🎉', desc: 'فز بأول مباراة' },
+                masterDeceiver: { name: 'خبير الخداع', icon: '🕵️', desc: 'افز 10 مباريات كجاسوس' },
+                eagleEye: { name: 'عين الصقر', icon: '🦅', desc: 'اكشف الجاسوس 5 مرات متتالية' },
+                perfectGame: { name: 'مباراة مثالية', icon: '🎯', desc: 'خمن الكلمة كجاسوس' },
+                centuryClub: { name: 'نادي المئة', icon: '💯', desc: 'العب 100 مباراة' },
+                hotStreak: { name: 'سلسلة نارية', icon: '🔥', desc: 'افز 5 مباريات متتالية' },
+                diamondPlayer: { name: 'لاعب ألماسي', icon: '💎', desc: 'وصل لرتبة الألماس' }
+            };
+
+            let unlockedCount = 0;
+            achievementsList.innerHTML = Object.keys(allAchievements).map(key => {
+                const ach = allAchievements[key];
+                const unlocked = achievements[key];
+                if (unlocked) unlockedCount++;
+
+                return `
+                    <div class="glass rounded-xl p-4 ${unlocked ? 'border-yellow-500/50' : 'opacity-50'}">
+                        <div class="flex items-center gap-3">
+                            <span class="text-4xl">${ach.icon}</span>
+                            <div class="flex-1">
+                                <h4 class="font-black text-white">${ach.name}</h4>
+                                <p class="text-xs text-gray-400">${ach.desc}</p>
+                            </div>
+                            ${unlocked ? '<i class="fas fa-check-circle text-yellow-400 text-xl"></i>' : '<i class="fas fa-lock text-gray-600 text-xl"></i>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('achievementCount').innerText = `${unlockedCount}/7`;
+        }
+
+        function displayCategoryStats(categoryStats) {
+            const container = document.getElementById('categoryStats');
+            const categories = Object.keys(categoryStats).sort((a, b) => categoryStats[b] - categoryStats[a]);
+
+            if (categories.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center">لا توجد إحصائيات بعد</p>';
+                
+                // Set favorite category
+                document.getElementById('favoriteCategory').innerText = '---';
+                document.getElementById('categoryCount').innerText = '0';
+                return;
+            }
+
+            // Set favorite category
+            document.getElementById('favoriteCategory').innerText = categories[0];
+            document.getElementById('categoryCount').innerText = categoryStats[categories[0]];
+
+            // Display all categories
+            container.innerHTML = categories.map(cat => {
+                const count = categoryStats[cat];
+                const maxCount = categoryStats[categories[0]];
+                const percentage = (count / maxCount) * 100;
+
+                return `
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="font-bold">${cat}</span>
+                            <span class="text-cyan-400" style="font-family: 'Orbitron', sans-serif;">${count}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill stat-bar-fill" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function initializeDefaultStats(uid) {
+            // Initialize with default values if not exists
+            // This will be handled by the game when stats are updated
+        }
+    </script>
+    <link rel="stylesheet" href="mobile.css">
+    <script src="sound-system.js" defer></script>
+    <script src="qr-notifications.js" defer></script>
+    <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
+    <!-- Mobile Bottom Nav -->
+    <nav id="mobile-nav">
+        <ul>
+            <li><a href="index.html"><i class="fas fa-home"></i>الرئيسية</a></li>
+            <li><a href="onlinerooms.html"><i class="fas fa-gamepad"></i>اللعب</a></li>
+            <li><a href="friends.html"><i class="fas fa-users"></i>الأصدقاء</a></li>
+            <li><a href="shop.html"><i class="fas fa-store"></i>المتجر</a></li>
+            <li><a href="account.html"><i class="fas fa-user"></i>حسابي</a></li>
+        </ul>
+    </nav>
+</body>
+</html>

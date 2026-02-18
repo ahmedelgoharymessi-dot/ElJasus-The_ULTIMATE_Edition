@@ -1,0 +1,260 @@
+/* ============================================
+   EL JASUS — MOBILE EXPERIENCE v2
+   ============================================ */
+
+/* ── GLOBAL MOBILE RESETS ─────────────────── */
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { touch-action: manipulation; }
+body { -webkit-font-smoothing: antialiased; overscroll-behavior: none; }
+button, a, input, select, textarea { touch-action: manipulation; }
+
+/* ── TOUCH-FRIENDLY TARGETS ───────────────── */
+button, .btn, [role="button"], a.nav-link {
+    min-height: 44px;
+    min-width:  44px;
+    cursor: pointer;
+}
+
+/* ── BOTTOM NAVIGATION BAR (mobile only) ──── */
+#mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 8000;
+    background: linear-gradient(135deg, rgba(8,12,24,.97), rgba(20,25,45,.97));
+    border-top: 2px solid rgba(0,242,255,.2);
+    backdrop-filter: blur(20px);
+    padding: 8px 0 env(safe-area-inset-bottom);
+}
+
+#mobile-nav ul {
+    display: flex;
+    justify-content: space-around;
+    list-style: none;
+    margin: 0; padding: 0;
+}
+
+#mobile-nav li a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 12px;
+    color: #888;
+    text-decoration: none;
+    font-family: 'Cairo', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 12px;
+    transition: all .25s;
+}
+
+#mobile-nav li a i { font-size: 18px; }
+#mobile-nav li a.active, #mobile-nav li a:hover {
+    color: #00f2ff;
+    text-shadow: 0 0 10px rgba(0,242,255,.7);
+}
+#mobile-nav li a.active { background: rgba(0,242,255,.08); }
+
+/* ── SAFE AREA ────────────────────────────── */
+.has-mobile-nav { padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
+
+/* ── RESPONSIVE BREAKPOINTS ───────────────── */
+@media (max-width: 768px) {
+    /* Show mobile nav */
+    #mobile-nav { display: block; }
+
+    /* Typography */
+    h1 { font-size: clamp(1.4rem, 5vw, 2rem) !important; }
+    h2 { font-size: clamp(1.2rem, 4vw, 1.6rem) !important; }
+    h3 { font-size: clamp(1rem,  3.5vw, 1.3rem) !important; }
+    p, span, label { font-size: clamp(0.82rem, 2.5vw, 1rem); }
+
+    /* Glass cards full-width */
+    .glass { border-radius: 18px !important; padding: 16px !important; }
+
+    /* Grids collapse */
+    .grid { grid-template-columns: 1fr !important; }
+    .md\:grid-cols-2, .lg\:grid-cols-3 { grid-template-columns: 1fr !important; }
+
+    /* Inputs larger */
+    input, textarea, select {
+        font-size: 16px !important; /* prevents iOS zoom */
+        padding: 14px !important;
+        border-radius: 12px !important;
+    }
+
+    /* Buttons full-width on small screens */
+    .btn-mobile-full { width: 100% !important; }
+
+    /* Hide non-essential decorations */
+    .decorative { display: none; }
+
+    /* Tables scroll */
+    table { display: block; overflow-x: auto; }
+
+    /* Sidebar hidden by default on mobile */
+    #sidebar { transform: translateX(-100%); transition: transform .3s ease; }
+    #sidebar.open { transform: translateX(0); }
+    #sidebar-overlay { display: block; }
+}
+
+@media (max-width: 480px) {
+    body { padding: 10px !important; }
+    .glass { padding: 12px !important; border-radius: 14px !important; }
+    h1 { font-size: 1.3rem !important; }
+}
+
+/* ── SIDEBAR OVERLAY (mobile) ─────────────── */
+#sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(4px);
+    z-index: 7990;
+}
+
+/* ── PULL-TO-REFRESH INDICATOR ────────────── */
+#pull-indicator {
+    position: fixed;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,242,255,.15);
+    border: 2px solid rgba(0,242,255,.4);
+    border-radius: 30px;
+    padding: 10px 24px;
+    color: #00f2ff;
+    font-size: 13px;
+    font-weight: 700;
+    z-index: 9000;
+    transition: top .3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── SWIPE GESTURE HINT ───────────────────── */
+.swipe-hint {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,.3);
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+}
+
+/* ── FLOATING ACTION BUTTON ───────────────── */
+#fab {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00f2ff, #7c30ff);
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,242,255,.5);
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 8001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all .3s;
+}
+
+#fab:hover, #fab:active { transform: scale(1.1); }
+
+@media (max-width: 768px) {
+    #fab { display: flex; }
+}
+
+/* ── TOAST NOTIFICATION ───────────────────── */
+.toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(0,242,255,.15);
+    border: 2px solid rgba(0,242,255,.4);
+    backdrop-filter: blur(12px);
+    border-radius: 30px;
+    padding: 10px 24px;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    z-index: 9999;
+    opacity: 0;
+    transition: all .3s ease;
+    font-family: 'Cairo', sans-serif;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── ORIENTATION WARNING ──────────────────── */
+@media (orientation: landscape) and (max-height: 500px) {
+    .landscape-warning {
+        display: flex;
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: rgba(10,14,26,.97);
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        color: white;
+        font-family: 'Cairo', sans-serif;
+        text-align: center;
+        padding: 20px;
+    }
+    .landscape-warning i { font-size: 48px; color: #00f2ff; }
+}
+
+/* ── QR CODE MODAL ────────────────────────── */
+#qr-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9995;
+    background: rgba(0,0,0,.85);
+    backdrop-filter: blur(12px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#qr-modal.open { display: flex; }
+
+#qr-box {
+    background: linear-gradient(135deg, rgba(15,20,35,.97), rgba(25,30,50,.97));
+    border: 2px solid rgba(0,242,255,.4);
+    border-radius: 24px;
+    padding: 32px;
+    text-align: center;
+    max-width: 320px;
+    width: 100%;
+}
+
+#qr-box canvas { border-radius: 12px; }
+
+/* ── HAPTIC FEEDBACK (visual) ─────────────── */
+@keyframes haptic {
+    0%,100% { transform: scale(1); }
+    50%      { transform: scale(.95); }
+}
+.haptic { animation: haptic .15s ease; }

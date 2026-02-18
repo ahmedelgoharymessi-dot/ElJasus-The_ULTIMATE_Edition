@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="الجاسوس">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأصدقاء | El Jasus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="ElJasus2.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --bg-color: #0a0e1a;
+            --primary-color: #00f2ff;
+            --secondary-color: #7c30ff;
+        }
+        
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1535 50%, #0f0c1d 100%);
+            background-attachment: fixed;
+            color: #ffffff; 
+            min-height: 100vh; 
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+        
+        .glass { 
+            background: linear-gradient(135deg, rgba(15, 20, 35, 0.9), rgba(25, 30, 50, 0.8));
+            backdrop-filter: blur(20px);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, rgba(0, 242, 255, 0.3), rgba(124, 48, 255, 0.3)) 1;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 30px rgba(0, 242, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 242, 255, 0.05), transparent);
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .neon-text {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.8), 0 0 20px rgba(0, 242, 255, 0.6);
+        }
+
+        .online-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+            animation: pulse 2s infinite;
+        }
+
+        .offline-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #666;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes slideInDown {
+            from { transform: translate(-50%, -100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        @keyframes slideOutUp {
+            from { transform: translate(-50%, 0); opacity: 1; }
+            to { transform: translate(-50%, -100%); opacity: 0; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <div class="max-w-6xl mx-auto relative z-10">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+            <a href="index.html" class="flex items-center gap-2 text-gray-400 hover:text-cyan-400 transition-all hover:translate-x-1">
+                <i class="fas fa-arrow-right text-xl"></i>
+                <span class="text-sm font-bold">رجوع</span>
+            </a>
+            
+            <div class="text-center flex-1">
+                <h1 class="text-3xl font-black uppercase tracking-tight neon-text">الأصدقاء</h1>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1" style="font-family: 'Orbitron', sans-serif;">FRIENDS</p>
+            </div>
+
+            <button id="addFriendBtn" class="px-4 py-2 bg-cyan-500/20 hover:bg-cyan-500/30 border-2 border-cyan-500/30 rounded-xl text-cyan-400 font-bold text-sm transition-all">
+                <i class="fas fa-user-plus ml-1"></i>
+                إضافة صديق
+            </button>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 animate__animated animate__fadeIn">
+            <div class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-bold opacity-50 uppercase tracking-wider mb-1">إجمالي الأصدقاء</p>
+                        <h3 id="totalFriends" class="text-3xl font-black text-cyan-400" style="font-family: 'Orbitron', sans-serif;">0</h3>
+                    </div>
+                    <div class="w-16 h-16 rounded-full bg-cyan-500/20 border-2 border-cyan-500/30 flex items-center justify-center">
+                        <i class="fas fa-users text-2xl text-cyan-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-bold opacity-50 uppercase tracking-wider mb-1">متصل الآن</p>
+                        <h3 id="onlineFriends" class="text-3xl font-black text-green-400" style="font-family: 'Orbitron', sans-serif;">0</h3>
+                    </div>
+                    <div class="w-16 h-16 rounded-full bg-green-500/20 border-2 border-green-500/30 flex items-center justify-center">
+                        <i class="fas fa-circle text-2xl text-green-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass rounded-2xl p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-bold opacity-50 uppercase tracking-wider mb-1">طلبات معلقة</p>
+                        <h3 id="pendingRequests" class="text-3xl font-black text-yellow-400" style="font-family: 'Orbitron', sans-serif;">0</h3>
+                    </div>
+                    <div class="w-16 h-16 rounded-full bg-yellow-500/20 border-2 border-yellow-500/30 flex items-center justify-center">
+                        <i class="fas fa-clock text-2xl text-yellow-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="glass rounded-2xl p-2 mb-6 animate__animated animate__fadeIn">
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="switchTab('friends')" id="tab-friends" class="tab-btn active px-4 py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all">
+                    <i class="fas fa-users ml-2"></i>
+                    الأصدقاء
+                </button>
+                <button onclick="switchTab('online')" id="tab-online" class="tab-btn px-4 py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all">
+                    <i class="fas fa-circle ml-2"></i>
+                    متصل
+                </button>
+                <button onclick="switchTab('requests')" id="tab-requests" class="tab-btn px-4 py-3 rounded-xl font-black text-sm uppercase tracking-wider transition-all">
+                    <i class="fas fa-envelope ml-2"></i>
+                    الطلبات
+                </button>
+            </div>
+        </div>
+
+        <!-- Friends List -->
+        <div id="friends-tab" class="tab-content">
+            <div class="glass rounded-2xl p-6">
+                <h2 class="text-xl font-black mb-4 neon-text">جميع الأصدقاء</h2>
+                <div id="friendsList" class="space-y-3">
+                    <!-- Friends will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Online Friends -->
+        <div id="online-tab" class="tab-content hidden">
+            <div class="glass rounded-2xl p-6">
+                <h2 class="text-xl font-black mb-4 neon-text">الأصدقاء المتصلون</h2>
+                <div id="onlineList" class="space-y-3">
+                    <!-- Online friends will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Friend Requests -->
+        <div id="requests-tab" class="tab-content hidden">
+            <div class="glass rounded-2xl p-6">
+                <h2 class="text-xl font-black mb-4 neon-text">طلبات الصداقة</h2>
+                <div id="requestsList" class="space-y-3">
+                    <!-- Requests will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Friend Modal -->
+    <div id="addFriendModal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="glass rounded-3xl p-8 max-w-md w-full animate__animated animate__zoomIn">
+            <h2 class="text-2xl font-black neon-text mb-4">إضافة صديق</h2>
+            <p class="text-gray-400 text-sm mb-4">أدخل اسم المستخدم أو البريد الإلكتروني</p>
+            
+            <input 
+                type="text" 
+                id="friendUsername" 
+                placeholder="اسم المستخدم"
+                class="w-full p-4 rounded-xl bg-white/5 border-2 border-cyan-500/30 text-white outline-none mb-4"
+            >
+            
+            <div class="flex gap-3">
+                <button id="sendRequestBtn" class="flex-1 bg-gradient-to-r from-cyan-500 to-purple-500 py-3 rounded-xl font-black text-sm uppercase">
+                    إرسال طلب
+                </button>
+                <button id="cancelAddBtn" class="flex-1 bg-white/5 border-2 border-white/10 py-3 rounded-xl font-black text-sm uppercase">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+        import { getDatabase, ref, get, set, update, onValue, push, remove } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+            authDomain: "el-jasus.firebaseapp.com",
+            databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "el-jasus",
+            appId: "1:415659587906:web:782f7940176ea4097eb0db"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let currentUser = null;
+        let friends = {};
+        let friendRequests = {};
+
+        // Tab switching
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+            document.getElementById(`${tab}-tab`).classList.remove('hidden');
+        };
+
+        // Add friend modal
+        document.getElementById('addFriendBtn').addEventListener('click', () => {
+            document.getElementById('addFriendModal').classList.remove('hidden');
+        });
+
+        document.getElementById('cancelAddBtn').addEventListener('click', () => {
+            document.getElementById('addFriendModal').classList.add('hidden');
+        });
+
+        // Auth check
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                loadFriends();
+                setupPresence();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Load friends
+        async function loadFriends() {
+            const friendsRef = ref(db, `players/${currentUser.uid}/friends`);
+            const requestsRef = ref(db, `players/${currentUser.uid}/friendRequests`);
+
+            // Listen to friends
+            onValue(friendsRef, async (snapshot) => {
+                friends = snapshot.val() || {};
+                await renderFriends();
+            });
+
+            // Listen to friend requests
+            onValue(requestsRef, (snapshot) => {
+                friendRequests = snapshot.val() || {};
+                renderRequests();
+            });
+        }
+
+        // Render friends
+        async function renderFriends() {
+            const friendsList = document.getElementById('friendsList');
+            const onlineList = document.getElementById('onlineList');
+            
+            const friendIds = Object.keys(friends);
+            
+            if (friendIds.length === 0) {
+                friendsList.innerHTML = '<p class="text-gray-400 text-center py-8">لا يوجد أصدقاء بعد</p>';
+                onlineList.innerHTML = '<p class="text-gray-400 text-center py-8">لا يوجد أصدقاء متصلون</p>';
+                document.getElementById('totalFriends').innerText = '0';
+                document.getElementById('onlineFriends').innerText = '0';
+                return;
+            }
+
+            const friendsData = [];
+            const onlineFriendsData = [];
+
+            for (const friendId of friendIds) {
+                const friendRef = ref(db, `players/${friendId}`);
+                const snapshot = await get(friendRef);
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const isOnline = data.presence?.online || false;
+                    
+                    const friendInfo = {
+                        uid: friendId,
+                        username: data.username || 'مجهول',
+                        online: isOnline
+                    };
+                    
+                    friendsData.push(friendInfo);
+                    if (isOnline) onlineFriendsData.push(friendInfo);
+                }
+            }
+
+            // Update stats
+            document.getElementById('totalFriends').innerText = friendsData.length;
+            document.getElementById('onlineFriends').innerText = onlineFriendsData.length;
+
+            // Render all friends
+            friendsList.innerHTML = friendsData.map(friend => createFriendCard(friend)).join('');
+            
+            // Render online friends
+            if (onlineFriendsData.length === 0) {
+                onlineList.innerHTML = '<p class="text-gray-400 text-center py-8">لا يوجد أصدقاء متصلون</p>';
+            } else {
+                onlineList.innerHTML = onlineFriendsData.map(friend => createFriendCard(friend, true)).join('');
+            }
+        }
+
+        // Create friend card
+        function createFriendCard(friend, showInvite = false) {
+            return `
+                <div class="bg-white/5 rounded-xl p-4 border-2 border-cyan-500/20 hover:border-cyan-500/50 transition-all">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="relative">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <div class="${friend.online ? 'online-indicator' : 'offline-indicator'} absolute bottom-0 right-0"></div>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-white">${friend.username}</h3>
+                                <p class="text-xs text-gray-400">${friend.online ? 'متصل الآن' : 'غير متصل'}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            ${showInvite ? `
+                                <button class="px-4 py-2 bg-cyan-500/20 border-2 border-cyan-500/30 rounded-lg text-cyan-400 text-xs font-bold">
+                                    <i class="fas fa-envelope ml-1"></i>
+                                    دعوة
+                                </button>
+                            ` : ''}
+                            <button onclick="removeFriend('${friend.uid}')" class="px-4 py-2 bg-red-500/20 border-2 border-red-500/30 rounded-lg text-red-400 text-xs font-bold">
+                                <i class="fas fa-user-minus ml-1"></i>
+                                إزالة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render requests
+        function renderRequests() {
+            const requestsList = document.getElementById('requestsList');
+            const requests = Object.keys(friendRequests);
+
+            document.getElementById('pendingRequests').innerText = requests.length;
+
+            if (requests.length === 0) {
+                requestsList.innerHTML = '<p class="text-gray-400 text-center py-8">لا توجد طلبات معلقة</p>';
+                return;
+            }
+
+            requestsList.innerHTML = requests.map(requestId => {
+                const request = friendRequests[requestId];
+                return `
+                    <div class="bg-white/5 rounded-xl p-4 border-2 border-yellow-500/20">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-white">${request.from.username}</h3>
+                                    <p class="text-xs text-gray-400">طلب صداقة</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="acceptRequest('${requestId}')" class="px-4 py-2 bg-green-500/20 border-2 border-green-500/30 rounded-lg text-green-400 text-xs font-bold">
+                                    <i class="fas fa-check ml-1"></i>
+                                    قبول
+                                </button>
+                                <button onclick="rejectRequest('${requestId}')" class="px-4 py-2 bg-red-500/20 border-2 border-red-500/30 rounded-lg text-red-400 text-xs font-bold">
+                                    <i class="fas fa-times ml-1"></i>
+                                    رفض
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Send friend request
+        document.getElementById('sendRequestBtn').addEventListener('click', async () => {
+            const username = document.getElementById('friendUsername').value.trim();
+            const btn = document.getElementById('sendRequestBtn');
+            
+            if (!username) {
+                showMessage('⚠️ الرجاء إدخال اسم المستخدم أو البريد الإلكتروني', 'warning');
+                return;
+            }
+
+            // Disable button during processing
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i>جاري الإرسال...';
+
+            try {
+                // Find user by username or email
+                const playersRef = ref(db, 'players');
+                const snapshot = await get(playersRef);
+                
+                let foundUser = null;
+                if (snapshot.exists()) {
+                    const players = snapshot.val();
+                    for (const uid in players) {
+                        if (uid === currentUser.uid) continue; // Skip self
+                        
+                        const matchUsername = players[uid].username?.toLowerCase() === username.toLowerCase();
+                        const matchEmail = players[uid].email?.toLowerCase() === username.toLowerCase();
+                        
+                        if (matchUsername || matchEmail) {
+                            foundUser = { uid, ...players[uid] };
+                            break;
+                        }
+                    }
+                }
+
+                if (!foundUser) {
+                    showMessage('❌ اسم المستخدم أو البريد الإلكتروني غير موجود', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-user-plus ml-2"></i>إرسال طلب';
+                    return;
+                }
+
+                // Check if already friends
+                const friendsSnap = await get(ref(db, `players/${currentUser.uid}/friends/${foundUser.uid}`));
+                if (friendsSnap.exists()) {
+                    showMessage('ℹ️ أنت بالفعل صديق لهذا المستخدم!', 'info');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-user-plus ml-2"></i>إرسال طلب';
+                    return;
+                }
+
+                // Check if request already sent
+                const existingRequestSnap = await get(ref(db, `players/${foundUser.uid}/friendRequests/${currentUser.uid}`));
+                if (existingRequestSnap.exists()) {
+                    showMessage('ℹ️ لقد أرسلت طلب صداقة بالفعل لهذا المستخدم. الرجاء انتظار الرد.', 'info');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-user-plus ml-2"></i>إرسال طلب';
+                    return;
+                }
+
+                // Check if they sent you a request (so you can just accept it)
+                const incomingRequestSnap = await get(ref(db, `players/${currentUser.uid}/friendRequests/${foundUser.uid}`));
+                if (incomingRequestSnap.exists()) {
+                    showMessage('ℹ️ هذا المستخدم أرسل لك طلباً بالفعل! يمكنك قبوله من قسم "الطلبات المعلقة"', 'info');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-user-plus ml-2"></i>إرسال طلب';
+                    return;
+                }
+
+                // Send request
+                const requestRef = ref(db, `players/${foundUser.uid}/friendRequests/${currentUser.uid}`);
+                await set(requestRef, {
+                    from: {
+                        uid: currentUser.uid,
+                        username: currentUser.displayName || 'مجهول'
+                    },
+                    timestamp: Date.now()
+                });
+
+                showMessage(`✅ تم إرسال طلب الصداقة إلى ${foundUser.username || 'المستخدم'} بنجاح!`, 'success');
+                document.getElementById('addFriendModal').classList.add('hidden');
+                document.getElementById('friendUsername').value = '';
+                
+                // Play sound effect
+                if (window.SND) window.SND.play('message');
+                
+            } catch (error) {
+                console.error('Friend request error:', error);
+                showMessage('❌ حدث خطأ أثناء إرسال الطلب: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-user-plus ml-2"></i>إرسال طلب';
+            }
+        });
+
+        // Helper function to show messages
+        function showMessage(text, type = 'info') {
+            // Remove existing message if any
+            const existing = document.getElementById('friend-message');
+            if (existing) existing.remove();
+
+            const msg = document.createElement('div');
+            msg.id = 'friend-message';
+            msg.textContent = text;
+            
+            const colors = {
+                success: 'background:rgba(34,197,94,.15);border:2px solid rgba(34,197,94,.5);color:#22c55e;',
+                error: 'background:rgba(239,68,68,.15);border:2px solid rgba(239,68,68,.5);color:#ef4444;',
+                warning: 'background:rgba(251,191,36,.15);border:2px solid rgba(251,191,36,.5);color:#fbbf24;',
+                info: 'background:rgba(59,130,246,.15);border:2px solid rgba(59,130,246,.5);color:#3b82f6;'
+            };
+            
+            msg.style.cssText = `position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:9999;
+                padding:16px 28px;border-radius:16px;font-family:'Cairo',sans-serif;font-weight:700;
+                font-size:14px;text-align:center;backdrop-filter:blur(12px);
+                box-shadow:0 8px 32px rgba(0,0,0,.5);animation:slideInDown .5s ease;
+                max-width:90%;${colors[type]}`;
+            
+            document.body.appendChild(msg);
+            
+            setTimeout(() => {
+                msg.style.animation = 'slideOutUp .5s ease';
+                setTimeout(() => msg.remove(), 500);
+            }, 4000);
+        }
+
+
+        // Accept request
+        window.acceptRequest = async (friendId) => {
+            // Add to both friends lists
+            await set(ref(db, `players/${currentUser.uid}/friends/${friendId}`), true);
+            await set(ref(db, `players/${friendId}/friends/${currentUser.uid}`), true);
+            
+            // Remove request
+            await remove(ref(db, `players/${currentUser.uid}/friendRequests/${friendId}`));
+            
+            alert('تم قبول الطلب');
+        };
+
+        // Reject request
+        window.rejectRequest = async (friendId) => {
+            await remove(ref(db, `players/${currentUser.uid}/friendRequests/${friendId}`));
+            alert('تم رفض الطلب');
+        };
+
+        // Remove friend
+        window.removeFriend = async (friendId) => {
+            if (!confirm('هل أنت متأكد من إزالة هذا الصديق؟')) return;
+            
+            await remove(ref(db, `players/${currentUser.uid}/friends/${friendId}`));
+            await remove(ref(db, `players/${friendId}/friends/${currentUser.uid}`));
+            
+            alert('تم إزالة الصديق');
+        };
+
+        // Setup presence
+        function setupPresence() {
+            const presenceRef = ref(db, `players/${currentUser.uid}/presence`);
+            
+            set(presenceRef, {
+                online: true,
+                lastSeen: Date.now()
+            });
+
+            // Update on disconnect
+            onValue(ref(db, '.info/connected'), (snapshot) => {
+                if (snapshot.val() === true) {
+                    update(presenceRef, { online: true });
+                } else {
+                    update(presenceRef, {
+                        online: false,
+                        lastSeen: Date.now()
+                    });
+                }
+            });
+        }
+
+        // Tab button styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .tab-btn {
+                position: relative;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+            }
+
+            .tab-btn.active {
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                border-color: var(--primary-color);
+                box-shadow: 0 0 20px rgba(0, 242, 255, 0.5);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+    <link rel="stylesheet" href="mobile.css">
+    <script src="sound-system.js" defer></script>
+    <script src="qr-notifications.js" defer></script>
+    <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
+    <!-- Mobile Bottom Nav -->
+    <nav id="mobile-nav">
+        <ul>
+            <li><a href="index.html"><i class="fas fa-home"></i>الرئيسية</a></li>
+            <li><a href="onlinerooms.html"><i class="fas fa-gamepad"></i>اللعب</a></li>
+            <li><a href="friends.html" class="active"><i class="fas fa-users"></i>الأصدقاء</a></li>
+            <li><a href="shop.html"><i class="fas fa-store"></i>المتجر</a></li>
+            <li><a href="account.html"><i class="fas fa-user"></i>حسابي</a></li>
+        </ul>
+    </nav>
+</body>
+</html>

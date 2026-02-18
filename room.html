@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الغرفة | El Jasus</title>
+    <!-- EL JASUS NEW FEATURES -->
+    <link rel="stylesheet" href="animations.css">
+    <link rel="stylesheet" href="mobile.css">
+    <script src="particles.js" defer></script>
+    <script src="sound-system.js" defer></script>
+    <script src="qr-notifications.js" defer></script>
+    <script src="emoji-reactions.js" defer></script>
+    <script src="voice-chat.js" defer></script>
+    <script src="screenshot.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="ElJasus2.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --bg-color: #0a0e1a;
+            --card-color: rgba(15, 20, 35, 0.95);
+            --btn-color: #00f2ff;
+            --text-color: #ffffff;
+            --accent-color: #00f2ff;
+            --secondary-color: #7c30ff;
+        }
+        
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1535 50%, #0f0c1d 100%);
+            background-attachment: fixed;
+            color: var(--text-color); 
+            min-height: 100vh; 
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+        
+        .glass { 
+            background: linear-gradient(135deg, rgba(15, 20, 35, 0.9), rgba(25, 30, 50, 0.8));
+            backdrop-filter: blur(20px);
+            border: 2px solid;
+            border-image: linear-gradient(135deg, rgba(0, 242, 255, 0.3), rgba(124, 48, 255, 0.3)) 1;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 30px rgba(0, 242, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(0, 242, 255, 0.05),
+                transparent
+            );
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .dynamic-text-primary { 
+            color: var(--accent-color);
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .dynamic-bg-primary { 
+            background: linear-gradient(135deg, var(--btn-color), var(--secondary-color));
+            color: #ffffff;
+            box-shadow: 
+                0 4px 15px rgba(0, 242, 255, 0.4),
+                inset 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-main { 
+            background: linear-gradient(135deg, var(--btn-color), var(--secondary-color));
+            color: #ffffff;
+            font-weight: 900;
+            border: 2px solid rgba(0, 242, 255, 0.5);
+            box-shadow: 
+                0 0 20px rgba(0, 242, 255, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn-main:hover { 
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 0 30px rgba(0, 242, 255, 0.6),
+                0 8px 20px rgba(0, 242, 255, 0.3);
+        }
+
+        .reveal-innocent {
+            background: linear-gradient(145deg, #065f46, #059669) !important;
+            border-color: #34d399 !important;
+            box-shadow: 0 0 40px rgba(52, 211, 153, 0.5);
+            animation: flipInY 0.6s;
+        }
+
+        .reveal-spy {
+            background: linear-gradient(145deg, #7f1d1d, #dc2626) !important;
+            border-color: #f87171 !important;
+            box-shadow: 0 0 40px rgba(248, 113, 113, 0.5);
+            animation: shakeX 0.5s;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { 
+            background: rgba(0, 242, 255, 0.05);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+            background: linear-gradient(180deg, var(--accent-color), var(--secondary-color));
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+
+        .fa-crown {
+            color: #ffd700;
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+        }
+
+        .neon-text {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 
+                0 0 10px rgba(0, 242, 255, 0.8),
+                0 0 20px rgba(0, 242, 255, 0.6);
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <!-- Game Screen (Turn-based reveal) -->
+    <div id="game-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="max-w-md w-full">
+            <div class="text-center mb-6">
+                <p class="text-[11px] dynamic-text-primary font-black uppercase tracking-widest mb-2" style="font-family: 'Orbitron', sans-serif;">دور اللاعب</p>
+                <h3 id="targetPlayer" class="text-4xl font-black neon-text">---</h3>
+            </div>
+            <div id="secretCard" class="h-96 glass rounded-[2.5rem] border-2 border-dashed border-cyan-500/50 flex flex-col items-center justify-center cursor-pointer shadow-2xl transition-all">
+                <i class="fas fa-fingerprint text-7xl mb-4 opacity-20"></i>
+                <p class="font-bold opacity-50 text-lg">انقر للكشف 🔒</p>
+            </div>
+            <button id="nextBtn" class="hidden mt-6 w-full dynamic-bg-primary py-5 rounded-2xl font-black uppercase tracking-wider text-lg shadow-xl">التالي ✔️</button>
+        </div>
+    </div>
+
+    <!-- Discussion Screen -->
+    <div id="discussion-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
+        <div class="glass w-full max-w-4xl rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            
+            <!-- Chat Button -->
+            <button id="toggleChatBtn" class="fixed top-6 left-6 z-[60] bg-gradient-to-r from-cyan-500 to-blue-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-all border-2 border-cyan-400/50">
+                <i class="fas fa-comments text-2xl"></i>
+            </button>
+
+            <!-- Chat Window -->
+            <div id="chatWindow" class="hidden fixed top-20 left-6 z-[60] w-80 glass rounded-2xl p-4 border-2 border-cyan-500/30 shadow-2xl animate__animated animate__slideInLeft">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-black text-cyan-400 neon-text">💬 الشات</h3>
+                    <button id="closeChatBtn" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="discussionMessages" class="h-64 overflow-y-auto custom-scrollbar mb-3 text-right text-xs bg-black/40 p-3 rounded-xl border border-white/10"></div>
+                <div class="flex gap-2">
+                    <input id="discussionInput" type="text" class="flex-1 bg-black/40 border border-white/10 p-2 rounded-lg text-xs outline-none focus:border-cyan-500" placeholder="اكتب رسالتك...">
+                    <button id="sendDiscussionBtn" class="dynamic-bg-primary px-4 rounded-lg text-xs font-black">
+                        إرسال
+                    </button>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-black mb-6 text-center neon-text">نقاش الجولة 🗣️</h2>
+            
+            <!-- Suspects List -->
+            <div id="suspectsList" class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6"></div>
+
+            <button id="goVoteBtn" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-4 rounded-2xl font-black text-sm shadow-xl hover:scale-102 transition-all uppercase tracking-wider border-2 border-purple-400/50">
+                الانتقال للتصويت ✅
+            </button>
+            <p id="discussionInfo" class="text-[10px] opacity-60 mt-2 text-center font-bold">
+                سيتم الانتقال للتصويت عندما يضغط جميع اللاعبين على زر الانتقال.
+            </p>
+                <!-- HINT SYSTEM -->
+                <div id="hint-section" class="mt-3 flex items-center justify-between p-3 rounded-xl" style="background:rgba(255,215,0,.08);border:2px solid rgba(255,215,0,.2);">
+                    <div class="flex items-center gap-2">
+                        <span style="font-size:20px;">💡</span>
+                        <div>
+                            <p class="text-xs font-bold text-yellow-400">تلميح للأبرياء</p>
+                            <p class="text-xs text-gray-400">رصيدك: <span id="hintBalance" class="text-yellow-400 font-bold">0</span> تلميح</p>
+                        </div>
+                    </div>
+                    <button id="useHintBtn" onclick="useHint()" class="px-4 py-2 rounded-xl font-black text-xs uppercase transition-all"
+                        style="background:linear-gradient(135deg,rgba(255,215,0,.3),rgba(255,165,0,.2));border:2px solid rgba(255,215,0,.5);color:#ffd700;">
+                        استخدم تلميحاً
+                    </button>
+                </div>
+                <div id="hint-display" class="hidden mt-2 p-3 rounded-xl text-center" style="background:rgba(255,215,0,.1);border:2px solid rgba(255,215,0,.3);">
+                    <p class="text-xs text-gray-400 mb-1">💡 التلميح</p>
+                    <p id="hint-text" class="font-black text-yellow-400"></p>
+                </div>
+        </div>
+    </div>
+
+    <!-- Voting Screen -->
+    <div id="voting-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
+        <div class="glass w-full max-w-2xl rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative">
+            <h2 class="text-2xl font-black mb-4 text-center neon-text">التصويت 🕵️‍♂️</h2>
+            <p class="text-sm opacity-70 mb-4 text-center font-bold">اختر اللاعب الذي تشك أنه الجاسوس</p>
+            
+            <div id="voteCards" class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6"></div>
+            
+            <p id="votingStatus" class="text-xs opacity-60 mt-4 text-center font-bold"></p>
+        </div>
+    </div>
+
+    <!-- Tie Screen -->
+    <div id="tie-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate__animated animate__fadeIn">
+        <h1 class="text-8xl font-black text-yellow-500 animate__animated animate__bounceIn" style="text-shadow: 0 0 30px rgba(234, 179, 8, 0.8); font-family: 'Orbitron', sans-serif;">
+            تعادل! 🤝
+        </h1>
+    </div>
+
+    <!-- Spinner Screen -->
+    <div id="spinner-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
+        <div class="glass w-full max-w-md rounded-[2.5rem] p-6 border border-white/10 shadow-2xl text-center">
+            <h2 class="text-2xl font-black mb-4 neon-text">اختيار عشوائي 🎯</h2>
+            <p class="text-sm opacity-70 mb-4">حدث تعادل، سيتم اختيار لاعب عشوائي</p>
+            
+            <div id="spinnerWheel" class="relative w-64 h-64 mx-auto mb-6 bg-gradient-to-br from-purple-900 to-pink-900 rounded-full border-4 border-yellow-500 flex items-center justify-center shadow-[0_0_50px_rgba(234,179,8,0.5)]">
+                <div id="spinnerPointer" class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 w-0 h-0 border-l-8 border-r-8 border-t-16 border-transparent border-t-yellow-500 z-10"></div>
+                <div id="spinnerContent" class="text-3xl font-black text-white"></div>
+            </div>
+            
+            <button id="startSpinnerBtn" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 py-4 rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition-all border-2 border-yellow-400/50">
+                ابدأ السحب 🎰
+            </button>
+        </div>
+    </div>
+
+    <!-- Spy Guess Screen -->
+    <div id="spy-guess-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
+        <div class="glass w-full max-w-2xl rounded-[2.5rem] p-6 border border-red-500/30 shadow-2xl text-center max-h-[90vh] overflow-y-auto">
+            <h2 class="text-2xl font-black mb-2 text-red-500 neon-text" style="text-shadow: 0 0 15px rgba(239, 68, 68, 0.8);">🕵️ الجاسوس المكشوف</h2>
+            <p id="spyNameDisplay" class="text-xl mb-4 font-bold"></p>
+            <p class="text-sm opacity-70 mb-4">اختر الكلمة الصحيحة من القائمة</p>
+            
+            <div id="categoryWordsList" class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6 max-h-96 overflow-y-auto custom-scrollbar"></div>
+            
+            <p id="guessResult" class="text-lg font-black mt-4"></p>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="result-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
+        <div class="glass w-full max-w-lg rounded-[2.5rem] p-8 border border-white/10 shadow-2xl text-center">
+            <div id="resultIcon" class="text-8xl mb-4"></div>
+            <h2 id="resultTitle" class="text-3xl font-black mb-2 neon-text"></h2>
+            <p id="resultMessage" class="text-lg mb-6 font-bold"></p>
+            <button id="returnToRoomBtn" class="w-full dynamic-bg-primary py-4 rounded-2xl font-black shadow-xl uppercase tracking-wider">
+                العودة للغرفة 🏠
+            </button>
+        </div>
+    </div>
+
+    <!-- Room Overlay -->
+    <div id="room-overlay" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate__animated animate__fadeIn">
+        <div class="glass w-full max-w-lg rounded-[2.5rem] p-6 border border-white/10 shadow-2xl relative">
+            
+            <!-- Back to Home -->
+            <a href="index.html" class="absolute top-4 left-4 text-gray-400 hover:text-cyan-400 transition-colors">
+                <i class="fas fa-arrow-right text-xl"></i>
+            </a>
+
+            <div class="flex justify-between items-start mb-6 mt-8">
+                <div>
+                    <h2 class="text-3xl font-black neon-text cursor-pointer" id="roomCodeContainer" title="اضغط للنسخ" style="font-family: 'Orbitron', sans-serif;">
+                        <span id="displayRoomCode">----</span> 
+                        <i class="fas fa-copy text-sm opacity-30 hover:opacity-100 transition-opacity"></i>
+                    </h2>
+                    <p class="text-[9px] opacity-50 uppercase font-bold tracking-widest" style="font-family: 'Orbitron', sans-serif;">كود الغرفة</p>
+                </div>
+                <button id="leaveRoomBtn" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs px-4 py-2 rounded-xl font-bold border-2 border-red-500/30 transition-all">
+                    مغادرة
+                </button>
+            </div>
+
+            <div id="host-controls" class="hidden space-y-3 mb-6 glass p-4 rounded-2xl border border-white/5">
+                <label class="text-[10px] font-bold opacity-40 uppercase tracking-wider" style="font-family: 'Orbitron', sans-serif;">إعدادات المضيف</label>
+                <select id="updateCat" onchange="updateRoomSettings()" class="w-full bg-black/60 text-sm p-3 rounded-xl border-2 border-cyan-500/20 outline-none focus:border-cyan-500 font-bold">
+                    <option value="places">🌍 أماكن سياحية</option>
+                    <option value="food">🍕 أكلات مصرية</option>
+                    <option value="jobs">🛠️ مهن ووظائف</option>
+                    <option value="companies">🏢 شركات عالمية</option>
+                    <option value="football_teams">⚽ أندية ومنتخبات كورة</option>
+                </select>
+                <div class="flex items-center justify-between bg-black/40 p-3 rounded-xl mb-3 border-2 border-cyan-500/20">
+                    <span class="text-xs font-bold">نوع الغرفة:</span>
+                    <button id="toggleVisibility" onclick="toggleRoomVisibility()" class="text-xs px-4 py-1.5 rounded-full border-2 transition-all font-bold"></button>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="text-[11px] font-bold opacity-50 uppercase tracking-widest" style="font-family: 'Orbitron', sans-serif;">اللاعبون المتصلون</label>
+                    <span id="pCount" class="text-[11px] font-black dynamic-text-primary" style="font-family: 'Orbitron', sans-serif;">0/10</span>
+                </div>
+                <div id="roomPlayersList" class="space-y-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar"></div>
+            </div>
+
+            <button id="hostStartBtn" class="hidden w-full btn-main py-4 rounded-2xl font-black shadow-xl disabled:opacity-30 disabled:cursor-not-allowed uppercase tracking-wider">
+                ابدأ اللعب 🚀
+            </button>
+            <div id="guestWaitMsg" class="hidden text-center py-2 opacity-40 animate-pulse text-sm font-bold">
+                في انتظار المضيف...
+            </div>
+            <div id="minPlayersMsg" class="hidden text-center text-xs text-yellow-500 mt-2 font-bold">
+                يجب توفر 3 لاعبين على الأقل
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, update, get, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+            authDomain: "el-jasus.firebaseapp.com",
+            databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "el-jasus",
+            appId: "1:415659587906:web:782f7940176ea4097eb0db"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const gameData = {
+            places: [
+                "المدرسة", "المستشفى", "حديقة الحيوان", "المطار", "النادي", "السينما", "المطعم", "البحر", "المزرعة", "السيرك",
+                "المكتبة", "المسجد", "المحل", "الصيدلية", "البنك", "المحكمة", "السجن", "الغابة", "الصحراء",
+                "الجبل", "القلعة", "القصر", "الفندق", "المتحف", "المسرح", "المخبز", "المقهى (القهوة)", "السوبر ماركت", "محطة القطار",
+                "محطة المترو", "الورشة", "الاستاد", "الجيم", "الحضانة", "الجامعة", "صالون الحلاقة", "المعمل", "المنزل", "المطبخ",
+                "غرفة النوم", "الحمام", "السطوح", "الشارع", "الكوبري", "الميناء", "السفارة", "المرصد", "المخيم", "الشلال",
+                "البحيرة", "الكهف", "المسبح (البيسين)", "المصنع", "المكتب", "الأتوبيس", "الطيارة", "المركب", "الفضاء", "القمر",
+                "المريخ", "السوق", "الملاهي", "حديقة عامة", "الشقة", "الفيلا", "الخيمة", "الجراج", "المصلحة الحكومية", "البريد",
+                "قسم الشرطة", "المطافئ", "الإسعاف", "العيادة", "المول", "محل الموبايلات", "السايبر", "استوديو تصوير", "قاعة أفراح", "عزاء",
+                "معرض سيارات", "محل ورد", "محل هدايا", "كشك", "بنزينة", "موقف ميكروباصات", "مغسلة سيارات", "محل حلويات", "فرن عيش", "محل سمك",
+                "محل جزارة", "محل بقالة", "صالة بولينج", "تنس طاولة", "ملعب كورة", "البورصة", "المدبح", "الجزيرة", "المنارة", "المقابر"
+            ],
+
+            football_teams: [
+                "الأهلي المصري", "الزمالك", "الإسماعيلي", "المصري البورسعيدي", "الاتحاد السكندري", "بيراميدز", "سموحة", "مودرن فيوتشر", "المقاولون العرب", "غزل المحلة", "الجونة", "البنك الأهلي", "سيراميكا كليوباترا", "إنبي", "طلائع الجيش", "حرس الحدود", "أسوان",
+                "الهلال السعودي", "النصر السعودي", "الاتحاد السعودي", "الأهلي السعودي", "الشباب السعودي", "العين الإماراتي", "شباب الأهلي", "الوداد المغربي", "الرجاء المغربي", "الجيش الملكي", "الترجي التونسي", "النجم الساحلي", "الإفريقي التونسي", "السد القطري", "الدحيل", "الكويت الكويتي", "القادسية الكويتي", "الوحدات الأردني", "الزوراء العراقي",
+                "ليفربول", "مانشستر سيتي", "مانشستر يونايتد", "أرسنال", "تشيلسي", "توتنهام", "أستون فيلا", "نيوكاسل يونايتد", "ليستر سيتي", "وست هام",
+                "ريال مدريد", "برشلونة", "أتلتيكو مدريد", "إشبيلية", "فالنسيا", "ريال سوسيداد", "فياريال", "بيلباو",
+                "يوفنتوس", "إيه سي ميلان", "إنتر ميلان", "نابولي", "روما", "لاتسيو", "فيورنتينا", "بايرن ميونخ", "بوروسيا دورتموند", "باير ليفركوزن", "لايبزيج", "باريس سان جيرمان", "مارسيليا", "ليون", "موناكو", "أياكس أمستردام", "بنفيكا", "بورتو",
+                "منتخب مصر", "منتخب السعودية", "منتخب المغرب", "منتخب الجزائر", "منتخب تونس", "منتخب قطر", "منتخب البرازيل", "منتخب الأرجنتين", "منتخب فرنسا", "منتخب ألمانيا", "منتخب إسبانيا", "منتخب إيطاليا", "منتخب إنجلترا", "منتخب البرتغال", "منتخب بلجيكا", "منتخب كرواتيا", "منتخب هولندا", "منتخب الأوروغواي", "منتخب اليابان", "منتخب كوريا الجنوبية", "منتخب السنغال", "منتخب نيجيريا", "منتخب الكاميرون"
+            ],
+
+            food: [
+                "كشري", "ملوخية", "فول", "طعمية (فلافل)", "فتة باللحمة", "حواوشي", "محشي كرنب", "محشي ورق عنب", "ممبار", "كوارع",
+                "فتة كوارع", "كفتة مشوية", "طرب", "كباب", "كبدة إسكندراني", "سجق شرقي", "مكرونة بشاميل", "رقاق باللحمة", "جلاش", "أرز بلبن",
+                "أم علي", "بسبوسة", "كنافة", "لقيمات (قاضي)", "فطير مشلتت", "مش وجبنة قديمة", "عسل أسود وطحينة", "كشك", "بصارة", "عدس",
+                "شوربة لسان عصفور", "أرز معمر", "مسقعة", "تورلي خضار", "بامية باللحمة", "قلقاس", "سبانخ", "أرز بالشعرية", "فراخ محمرة", "حمام محشي",
+                "بط", "أرانب", "سمك بلطي", "سمك بوري", "جمبري", "سبيط", "فسيخ", "رنجة", "ملوحة", "بطاطس محمرة","بابا غنوج", "سلطة خضراء", "مخلل (طرشي)",
+                "باذنجان مخلل", "بيض بالبسطرمة", "شكشوكة", "عجة", "مخ بانيه", "كبدة وقوانص", "كفتة",
+                "كفتة أرز", "أرز صيادية", "كيكة برتقال", "رز بلبن", "مهلبية", "قمر الدين", "عاشورا", "زلابيا", "بلح الشام", "صوابع زينب",
+                "كحك العيد", "بسكويت نشادر", "غريبة", "بيتيفور", "منين (قراقيش)", "قرص بعجوة", "عيش بلدي", "عيش فينو", "شاورما مصري", "فراخ بانيه",
+                "صينية بطاطس", "مكرونة بالصلصة", "ساندوتش جبنة", "شاي بلبن", "سحلب", "عصير قصب", "عرقسوس", "تمرهندي", "خروب", "سوبيا",
+                "مدمس", "بيض مسلوق", "جبنة بيضا", "لانشون", "بسطرمة", "مخروطة", "كوسة بالبشاميل", "أرز بالخلطة", "كبدة جملي", "فريك"
+            ],
+
+            jobs: [
+                "دكتور", "مهندس", "مدرس", "ضابط", "محامي", "محاسب", "ممرض", "صيدلي", "طيار", "سواق",
+                "نجار", "سباك", "كهربائي", "نقاش", "بنا", "ميكانيكي", "حلاق", "خياط", "طباخ", "جزار",
+                "بائع", "صحفي", "مذيع", "ممثل", "مغني", "رسام", "مصور", "لاعب كورة", "مدرب", "حكم",
+                "عامل نظافة", "بواب", "عامل دليفري", "نجار مسلح", "حداد", "فلاح", "صياد", "قاضي", "رجل إطفاء", "عسكري",
+                "مأذون", "إمام مسجد", "قسيس", "مألف", "شاعر", "مخرج", "مونتير", "مصمم جرافيك", "مبرمج", "هكر",
+                "عالم", "رائد فضاء", "غطاس", "طيار حربي", "مضيفة طيران", "مترجم", "سكرتير", "مدير", "وزير", "رئيس",
+                "خبير تجميل", "موديل", "يوتيوبر", "تيكتوكر", "بلوجر", "عامل بنزينة", "صراف", "جرسون", "شيف", "حلواني",
+                "خفير", "بودي جارد", "محقق", "جاسوس", "رجل أعمال", "بائع خضار", "بائع فاكهة", "بائع لبن", "مكوجي", "منجد",
+                "عامل بناء", "فني تكييف", "فني راديو", "ساحر", "مهرج", "راقص", "مدرب جيم", "سباح محترف", "عامل منجم", "عامل شحن",
+                "ساعي بريد", "موظف استقبال", "طبيب بيطري", "طبيب أسنان", "طبيب عيون", "محلل كورة", "سمسار", "تاجر", "مقاول", "طيار درون"
+            ],
+
+            companies: [
+                "Apple", "Google", "Microsoft", "Amazon", "Facebook", "Instagram", "WhatsApp", "YouTube", "TikTok", "Netflix",
+                "Samsung", "Huawei", "Xiaomi", "Oppo", "Sony", "LG", "Dell", "HP", "Intel", "Canon",
+                "Tesla", "Toyota", "Mercedes", "BMW", "Audi", "Ferrari", "Lamborghini", "Ford", "Chevrolet", "Jeep",
+                "Nike", "Adidas", "Puma", "Zara", "H&M", "Gucci", "Prada", "Rolex", "Lacoste", "Chanel",
+                "McDonald's", "KFC", "Burger King", "Pizza Hut", "Subway", "Starbucks", "Pepsi", "Coca-Cola", "Red Bull", "KitKat",
+                "Disney", "Marvel", "DC Comics", "Warner Bros", "Paramount", "Pixar", "Universal", "Spotify", "Snapchat", "Telegram",
+                "Visa", "Mastercard", "PayPal", "Binance", "Amazon", "eBay", "Alibaba", "AliExpress", "Shein", "Noon",
+                "Uber", "Careem", "Airbnb", "Booking", "FedEx", "DHL", "Aramex", "IKEA", "Walmart", "Carrefour",
+                "Nestle", "Dove", "Nivea", "L'Oreal", "Johnson's", "Colgate", "Gillette", "Rolex", "Casio", "Nikon",
+                "Lego", "Barbie", "Hot Wheels", "PlayStation", "Xbox", "Nintendo", "Zoom", "Skype", "Slack", "LinkedIn"
+            ]
+        };
+
+        let myName = localStorage.getItem('eljasus_user_name') || "";
+        let myRoom = localStorage.getItem('currentRoom') || "";
+        let isHost = localStorage.getItem('isHost') === 'true';
+
+        // Check if coming from onlinerooms.html with pending join
+        const pendingRoom = localStorage.getItem('pendingRoomJoin');
+        if (pendingRoom) {
+            myRoom = pendingRoom;
+            localStorage.removeItem('pendingRoomJoin');
+            localStorage.setItem('currentRoom', myRoom);
+            
+            // Join the room
+            (async () => {
+                const snap = await get(ref(db, 'rooms/' + myRoom));
+                if(snap.exists()) {
+                    const d = snap.val();
+                    if(!d.players.includes(myName)) {
+                        if(d.players.length < 10) {
+                            await update(ref(db, 'rooms/' + myRoom), { players: [...d.players, myName] });
+                        }
+                    }
+                    isHost = false;
+                    localStorage.setItem('isHost', 'false');
+                }
+            })();
+        }
+
+        // Redirect if no room found
+        if (!myRoom || !myName) {
+            window.location.href = 'index.html';
+        }
+
+        function hideAllGameScreens() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('discussion-screen').classList.add('hidden');
+            document.getElementById('voting-screen').classList.add('hidden');
+            document.getElementById('tie-screen').classList.add('hidden');
+            document.getElementById('spinner-screen').classList.add('hidden');
+            document.getElementById('spy-guess-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('room-overlay').classList.add('hidden');
+        }
+
+        function setupPresence(roomCode, playerName) {
+            const connectedRef = ref(db, ".info/connected");
+            onValue(connectedRef, (snap) => {
+                if (snap.val() === true) {
+                    const roomRef = ref(db, `rooms/${roomCode}`);
+
+                    onDisconnect(roomRef).get().then((snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            
+                            if (data.host === playerName) {
+                                onDisconnect(roomRef).remove();
+                            } else {
+                                let updatedPlayers = data.players.map(p => 
+                                    p === playerName ? `${playerName} (خامل)` : p
+                                );
+                                onDisconnect(ref(db, `rooms/${roomCode}/players`)).set(updatedPlayers);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function initRoom() {
+            const roomRef = ref(db, 'rooms/' + myRoom);
+            
+            onValue(roomRef, (snap) => {
+                const d = snap.val();
+                if(!d) { 
+                    localStorage.removeItem('currentRoom');
+                    localStorage.removeItem('isHost');
+                    window.location.href = 'index.html';
+                    return; 
+                }
+
+                if (d.players && d.players.includes(`${myName} (خامل)`)) {
+                    let restoredPlayers = d.players.map(p => p === `${myName} (خامل)` ? myName : p);
+                    update(ref(db, 'rooms/' + myRoom), { players: restoredPlayers });
+                    return;
+                }
+                
+                if(!d.players.includes(myName)) {
+                    alert("تم طردك من الغرفة");
+                    localStorage.removeItem('currentRoom');
+                    localStorage.removeItem('isHost');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                document.getElementById('displayRoomCode').innerText = myRoom;
+                const pCount = d.players.length;
+                document.getElementById('pCount').innerText = `${pCount}/10`;
+                
+                isHost = (d.host === myName);
+
+                if(isHost) {
+                    document.getElementById('host-controls').classList.remove('hidden');
+                    document.getElementById('hostStartBtn').classList.remove('hidden');
+                    document.getElementById('guestWaitMsg').classList.add('hidden');
+                    
+                    const startBtn = document.getElementById('hostStartBtn');
+                    const msg = document.getElementById('minPlayersMsg');
+                    if(pCount >= 3) {
+                        startBtn.disabled = false;
+                        msg.classList.add('hidden');
+                    } else {
+                        startBtn.disabled = true;
+                        msg.classList.remove('hidden');
+                    }
+
+                    const vBtn = document.getElementById('toggleVisibility');
+                    vBtn.innerHTML = d.visibility === 'public' ? '<i class="fas fa-globe mr-1"></i> عام' : '<i class="fas fa-lock mr-1"></i> خاص';
+                    vBtn.className = d.visibility === 'public' ? "text-xs px-4 py-1.5 rounded-full border-2 border-green-500 text-green-400 font-bold hover:bg-green-500/10" : "text-xs px-4 py-1.5 rounded-full border-2 border-red-500 text-red-400 font-bold hover:bg-red-500/10";
+                } else {
+                    document.getElementById('host-controls').classList.add('hidden');
+                    document.getElementById('hostStartBtn').classList.add('hidden');
+                    document.getElementById('guestWaitMsg').classList.remove('hidden');
+                    document.getElementById('minPlayersMsg').classList.add('hidden');
+                }
+
+                document.getElementById('roomPlayersList').innerHTML = d.players.map(p => {
+                    const isMe = (p === myName);
+                    const isTargetHost = (p === d.host);
+                    const isIdle = p.includes("(خامل)");
+                    const displayName = p.replace("(خامل)", "").trim();
+
+                    return `
+                        <div class="flex justify-between items-center p-3 glass rounded-xl border border-cyan-500/20 mb-2 hover:border-cyan-500/40 transition-all">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl">
+                                    ${isTargetHost ? '<i class="fas fa-crown"></i>' : (isIdle ? '💤' : '👤')} 
+                                </span>
+                                <span class="text-sm ${isIdle ? 'text-gray-500 italic' : 'text-white font-bold'}">
+                                    ${displayName} 
+                                    ${isIdle ? '<span class="text-[10px] ml-1 opacity-60 text-gray-500">(خامل)</span>' : ''}
+                                    ${isMe ? '<span class="text-[10px] text-cyan-400 ml-1">(أنت)</span>' : ''}
+                                </span>
+                            </div>
+                            
+                            ${isHost && !isMe ? `
+                                <button onclick="kickPlayer('${p}')" 
+                                    class="text-[10px] bg-red-600/20 hover:bg-red-600/40 text-red-400 px-3 py-1.5 rounded-lg font-bold shadow-lg border border-red-500/30 transition-all">
+                                    طرد
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                if(d.status && d.status !== 'waiting') {
+                    hideAllGameScreens();
+                    if(d.status === 'playing') showOnlineGame(d);
+                    else if(d.status === 'discussion') showDiscussionScreen(d);
+                    else if(d.status === 'voting') showVotingScreen(d);
+                    else if(d.status === 'tie') showTieScreen(d);
+                    else if(d.status === 'spinner') showSpinnerScreen(d);
+                    else if(d.status === 'spy_guess') showSpyGuessScreen(d);
+                    else if(d.status === 'result') showResultScreen(d);
+                } else { 
+                    hideAllGameScreens();
+                    document.getElementById('room-overlay').classList.remove('hidden');
+                }
+            });
+        }
+
+        async function handleLeave(data, nameToLeave) {
+            let players = data.players.filter(p => p !== nameToLeave);
+            if(players.length === 0) {
+                await remove(ref(db, 'rooms/' + myRoom));
+            } else {
+                let updates = { players: players };
+                if(data.host === nameToLeave) {
+                    updates.host = players[Math.floor(Math.random() * players.length)];
+                }
+                await update(ref(db, 'rooms/' + myRoom), updates);
+            }
+        }
+
+        window.kickPlayer = async (targetName) => {
+            const snap = await get(ref(db, 'rooms/' + myRoom));
+            if(snap.exists()) {
+                const d = snap.val();
+                const newPlayers = d.players.filter(p => p !== targetName);
+                await update(ref(db, 'rooms/' + myRoom), { players: newPlayers });
+            }
+        };
+
+        document.getElementById('leaveRoomBtn').onclick = async () => {
+            const snap = await get(ref(db, 'rooms/' + myRoom));
+            if(snap.exists()) {
+                await handleLeave(snap.val(), myName);
+            }
+            localStorage.removeItem('currentRoom');
+            localStorage.removeItem('isHost');
+            window.location.href = 'index.html';
+        };
+
+        window.toggleRoomVisibility = async () => {
+            const s = await get(ref(db, 'rooms/' + myRoom));
+            update(ref(db, 'rooms/' + myRoom), { visibility: s.val().visibility === 'private' ? 'public' : 'private' });
+        };
+
+        window.updateRoomSettings = () => {
+            update(ref(db, 'rooms/' + myRoom), { category: document.getElementById('updateCat').value });
+        };
+
+        document.getElementById('hostStartBtn').onclick = async () => {
+            const snap = await get(ref(db, 'rooms/' + myRoom));
+            const d = snap.val();
+            
+            if(d.status && d.status !== 'waiting') {
+                alert("الرجاء الانتظار حتى انتهاء الجولة الحالية");
+                return;
+            }
+            
+            const secret = gameData[d.category][Math.floor(Math.random() * gameData[d.category].length)];
+            // MULTIPLE SPIES: 1 for <8 players, 2 for 8+, 3 for 12+
+            const spyCount = d.players.length >= 12 ? 3 : d.players.length >= 8 ? 2 : 1;
+            const spyIndices = [];
+            while (spyIndices.length < spyCount) {
+                const idx = Math.floor(Math.random() * d.players.length);
+                if (!spyIndices.includes(idx)) spyIndices.push(idx);
+            }
+            update(ref(db, 'rooms/' + myRoom), { 
+                status: 'playing', 
+                secret: secret, 
+                spyIdx: spyIndices[0],
+                spyIndices: spyIndices,
+                spyCount: spyCount,
+                turn: 0,
+                suspects: {},
+                discussionMessages: [],
+                readyForVote: [],
+                votes: {},
+                tiedPlayers: null,
+                spyGuess: null,
+                winner: null,
+                votedPlayer: null,
+                hints: {}
+            });
+        };
+
+        // GAME PHASES
+
+        function showOnlineGame(d) {
+            hideAllGameScreens();
+            document.getElementById('game-screen').classList.remove('hidden');
+            const isMyTurn = d.players[d.turn] === myName;
+            document.getElementById('targetPlayer').innerText = d.players[d.turn];
+            
+            const card = document.getElementById('secretCard');
+            const btn = document.getElementById('nextBtn');
+            card.classList.remove('reveal-spy', 'reveal-innocent');
+            card.innerHTML = `<i class="fas fa-fingerprint text-7xl mb-4 opacity-20"></i><p class="font-bold opacity-50 text-lg">انقر للكشف 🔒</p>`;
+            card.style.pointerEvents = isMyTurn ? "auto" : "none";
+            btn.classList.add('hidden');
+
+            card.onclick = () => {
+                if((d.spyIndices || [d.spyIdx]).includes(d.players.indexOf(myName))) {
+                    card.classList.add('reveal-spy');
+                    card.innerHTML = `<i class="fas fa-user-secret text-8xl mb-4"></i><h2 class="text-4xl font-black italic">جاسوس</h2>`;
+                    if(window.SND) SND.announce.spyReveal();
+                    if(window.particleSystem) particleSystem.spyReveal();
+                } else {
+                    card.classList.add('reveal-innocent');
+                    card.innerHTML = `<i class="fas fa-key text-6xl mb-4"></i><h2 class="text-4xl font-black">${d.secret}</h2>`;
+                    if(window.SND) SND.announce.innocentReveal();
+                    if(window.particleSystem) particleSystem.innocentReveal();
+                }
+                btn.classList.remove('hidden');
+                card.onclick = null;
+            };
+
+            btn.onclick = () => {
+                if(d.turn + 1 >= d.players.length) {
+                    update(ref(db, 'rooms/' + myRoom), { 
+                        status: 'discussion',
+                        suspects: {},
+                        discussionMessages: [],
+                        readyForVote: [],
+                        votes: {}
+                    });
+                } else {
+                    update(ref(db, 'rooms/' + myRoom), { turn: d.turn + 1 });
+                }
+            };
+        }
+
+        function showDiscussionScreen(d) {
+            hideAllGameScreens();
+            document.getElementById('discussion-screen').classList.remove('hidden');
+
+            // Init emoji picker on chat input
+            const chatInput = document.getElementById('discussionInput');
+            if (chatInput && window.EmojiPicker && !chatInput._emojiInit) {
+                chatInput._emojiInit = true;
+                new EmojiPicker(chatInput, null);
+            }
+
+            // Init reaction bar
+            const suspectsList = document.getElementById('suspectsList');
+            if (suspectsList && window.ReactionSystem && !suspectsList._reactInit) {
+                suspectsList._reactInit = true;
+                window._reactions = new ReactionSystem(document.getElementById('discussion-screen'));
+            }
+
+            // Load hint balance
+            if (typeof loadHintBalance === 'function') loadHintBalance();
+
+            // Show any existing room hints
+            showRoomHints(d);
+            
+            const suspectsList = document.getElementById('suspectsList');
+            suspectsList.innerHTML = d.players.map(p => {
+                const suspectCount = d.suspects && d.suspects[p] ? d.suspects[p].length : 0;
+                const isSuspect = d.suspects && d.suspects[p] && d.suspects[p].includes(myName);
+                return `
+                    <div class="glass rounded-2xl p-4 border-2 ${isSuspect ? 'border-red-500' : 'border-cyan-500/30'} text-center hover:border-cyan-500/60 transition-all">
+                        <div class="text-3xl mb-2">${p === d.host ? '👑' : '👤'}</div>
+                        <h3 class="font-black text-sm mb-2">${p}</h3>
+                        <div class="text-xs opacity-60 mb-3">${suspectCount} شخص يشك به</div>
+                        <button onclick="toggleSuspect('${p}')" class="${isSuspect ? 'bg-red-600 hover:bg-red-700' : 'bg-white/10 hover:bg-white/20'} w-full py-2 rounded-lg text-xs font-bold transition-all border-2 ${isSuspect ? 'border-red-400' : 'border-white/20'}">
+                            ${isSuspect ? 'إلغاء الشك ❌' : 'أشك به 🔍'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            if(d.discussionMessages) {
+                const messagesDiv = document.getElementById('discussionMessages');
+                messagesDiv.innerHTML = d.discussionMessages.map(m => 
+                    `<div class="mb-2"><span class="font-bold text-cyan-400">${m.player}:</span> ${m.msg}</div>`
+                ).join('');
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+
+            const readyCount = d.readyForVote ? d.readyForVote.length : 0;
+            document.getElementById('discussionInfo').innerText = `${readyCount}/${d.players.length} لاعب جاهز للتصويت`;
+            
+            const goVoteBtn = document.getElementById('goVoteBtn');
+            const isReady = d.readyForVote && d.readyForVote.includes(myName);
+            goVoteBtn.innerText = isReady ? 'في انتظار اللاعبين... ⏳' : 'الانتقال للتصويت ✅';
+            goVoteBtn.disabled = isReady;
+            goVoteBtn.onclick = () => markReadyForVote();
+        }
+
+        window.toggleSuspect = async (targetPlayer) => {
+            const snap = await get(ref(db, 'rooms/' + myRoom));
+            const d = snap.val();
+            let suspects = d.suspects || {};
+            
+            if(!suspects[targetPlayer]) suspects[targetPlayer] = [];
+            
+            if(suspects[targetPlayer].includes(myName)) {
+                suspects[targetPlayer] = suspects[targetPlayer].filter(p => p !== myName);
+            } else {
+                suspects[targetPlayer].push(myName);
+            }
+            
+            update(ref(db, 'rooms/' + myRoom), { suspects });
+        };
+
+        async function markReadyForVote() {
+            const snap = await get(ref(db, 'rooms/' + myRoom));
+            const d = snap.val();
+            let ready = d.readyForVote || [];
+            
+            if(!ready.includes(myName)) {
+                ready.push(myName);
+                await update(ref(db, 'rooms/' + myRoom), { readyForVote: ready });
+            }
+            
+            if(ready.length >= d.players.length) {
+                await update(ref(db, 'rooms/' + myRoom), { 
+                    status: 'voting',
+                    votes: {}
+                });
+            }
+        }
+
+        document.getElementById('toggleChatBtn').onclick = () => {
+            document.getElementById('chatWindow').classList.toggle('hidden');
+        };
+
+        document.getElementById('closeChatBtn').onclick = () => {
+            document.getElementById('chatWindow').classList.add('hidden');
+        };
+
+        document.getElementById('sendDiscussionBtn').onclick = async () => {
+            const input = document.getElementById('discussionInput');
+            const msg = input.value.trim();
+            if(!msg) return;
+            
+            const snap = await get(ref(db, 'rooms/' + myRoom));
+            const d = snap.val();
+            let messages = d.discussionMessages || [];
+            messages.push({ player: myName, msg: msg });
+            
+            await update(ref(db, 'rooms/' + myRoom), { discussionMessages: messages });
+            input.value = '';
+        };
+
+        document.getElementById('discussionInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('sendDiscussionBtn').click();
+            }
+        });
+
+        function showVotingScreen(d) {
+            if (window.SND) SND.announce.voting();
+            hideAllGameScreens();
+            document.getElementById('voting-screen').classList.remove('hidden');
+            
+            const hasVoted = d.votes && d.votes[myName];
+            const voteCards = document.getElementById('voteCards');
+            
+            voteCards.innerHTML = d.players.map(p => {
+                const voteCount = Object.values(d.votes || {}).filter(v => v === p).length;
+                const isMyVote = d.votes && d.votes[myName] === p;
+                return `
+                    <div class="glass rounded-2xl p-4 border-2 ${isMyVote ? 'border-yellow-500' : 'border-cyan-500/30'} text-center ${hasVoted ? 'opacity-50' : ''} hover:border-cyan-500/60 transition-all">
+                        <div class="text-4xl mb-2">${p === d.host ? '👑' : '👤'}</div>
+                        <h3 class="font-black text-sm mb-2">${p}</h3>
+                        <div class="text-xs opacity-60 mb-3 font-bold">${voteCount} صوت</div>
+                        <button onclick="castVote('${p}')" ${hasVoted ? 'disabled' : ''} class="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed w-full py-2 rounded-lg text-xs font-bold transition-all border-2 border-yellow-400/50">
+                            ${isMyVote ? 'تم التصويت ✓' : 'صوّت 🗳️'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            const votedCount = Object.keys(d.votes || {}).length;
+            document.getElementById('votingStatus').innerText = `${votedCount}/${d.players.length} لاعب قام بالتصويت`;
+        }
+
+        window.castVote = async (targetPlayer) => {
+            const snap = await get(ref(db, 'rooms/' + myRoom));
+            const d = snap.val();
+            
+            if(d.votes && d.votes[myName]) return;
+            
+            let votes = d.votes || {};
+            votes[myName] = targetPlayer;
+            
+            await update(ref(db, 'rooms/' + myRoom), { votes });
+            
+            if(Object.keys(votes).length >= d.players.length) {
+                processVotes(d, votes);
+            }
+        };
+
+        async function processVotes(d, votes) {
+            const voteCounts = {};
+            d.players.forEach(p => voteCounts[p] = 0);
+            Object.values(votes).forEach(v => voteCounts[v]++);
+            
+            const maxVotes = Math.max(...Object.values(voteCounts));
+            const topVoted = Object.keys(voteCounts).filter(p => voteCounts[p] === maxVotes);
+            
+            if(topVoted.length > 1) {
+                await update(ref(db, 'rooms/' + myRoom), { 
+                    status: 'tie',
+                    tiedPlayers: topVoted
+                });
+                setTimeout(async () => {
+                    await update(ref(db, 'rooms/' + myRoom), { status: 'spinner' });
+                }, 2000);
+            } else {
+                checkGameResult(d, topVoted[0]);
+            }
+        }
+
+        function showTieScreen(d) {
+            hideAllGameScreens();
+            document.getElementById('tie-screen').classList.remove('hidden');
+            
+            setTimeout(() => {
+                document.getElementById('tie-screen').classList.add('hidden');
+            }, 2000);
+        }
+
+        function showSpinnerScreen(d) {
+            hideAllGameScreens();
+            document.getElementById('spinner-screen').classList.remove('hidden');
+            
+            const spinnerContent = document.getElementById('spinnerContent');
+            const startBtn = document.getElementById('startSpinnerBtn');
+            
+            startBtn.onclick = async () => {
+                startBtn.disabled = true;
+                let index = 0;
+                const interval = setInterval(() => {
+                    spinnerContent.innerText = d.tiedPlayers[index % d.tiedPlayers.length];
+                    index++;
+                }, 100);
+                
+                setTimeout(async () => {
+                    clearInterval(interval);
+                    const selected = d.tiedPlayers[Math.floor(Math.random() * d.tiedPlayers.length)];
+                    spinnerContent.innerText = selected;
+                    
+                    setTimeout(async () => {
+                        await checkGameResult(d, selected);
+                    }, 1500);
+                }, 3000);
+            };
+        }
+
+        async function checkGameResult(d, votedPlayer) {
+            const spyName = d.players[d.spyIdx];
+            
+            if(votedPlayer === spyName) {
+                await update(ref(db, 'rooms/' + myRoom), { 
+                    status: 'spy_guess',
+                    votedPlayer: spyName
+                });
+            } else {
+                await update(ref(db, 'rooms/' + myRoom), { 
+                    status: 'result',
+                    winner: 'spy',
+                    spyName: spyName
+                });
+            }
+        }
+
+        function showSpyGuessScreen(d) {
+            hideAllGameScreens();
+            document.getElementById('spy-guess-screen').classList.remove('hidden');
+            
+            const spyName = d.players[d.spyIdx];
+            document.getElementById('spyNameDisplay').innerText = spyNames.length > 1 
+                    ? `الجواسيس هم: ${spyNames.join(' و ')}` 
+                    : `الجاسوس هو: ${spyName}`;
+            
+            const categoryWords = gameData[d.category];
+            const wordsList = document.getElementById('categoryWordsList');
+            
+            const isSpy = myName === spyName;
+            const hasGuessed = d.spyGuess !== undefined;
+            
+            wordsList.innerHTML = categoryWords.map(word => `
+                <button onclick="spyGuessWord('${word}')" ${!isSpy || hasGuessed ? 'disabled' : ''} 
+                    class="glass rounded-xl p-3 border-2 border-cyan-500/30 font-bold text-sm hover:border-cyan-500 disabled:opacity-30 transition-all">
+                    ${word}
+                </button>
+            `).join('');
+            
+            if(hasGuessed) {
+                const correct = d.spyGuess === d.secret;
+                document.getElementById('guessResult').innerHTML = correct ? 
+                    '<span class="text-green-500">✓ إجابة صحيحة!</span>' : 
+                    '<span class="text-red-500">✗ إجابة خاطئة!</span>';
+            }
+        }
+
+        window.spyGuessWord = async (word) => {
+            const snap = await get(ref(db, 'rooms/' + myRoom));
+            const d = snap.val();
+            
+            const correct = word === d.secret;
+            
+            await update(ref(db, 'rooms/' + myRoom), { 
+                spyGuess: word,
+                status: 'result',
+                winner: correct ? 'spy' : 'innocents',
+                spyName: d.players[d.spyIdx]
+            });
+        };
+
+        function showResultScreen(d) {
+            // Victory effects
+            setTimeout(() => {
+                if (window.SND) {
+                    d.winner === 'spy' ? SND.announce.spyWins() : SND.announce.innocentsWin();
+                }
+                if (window.particleSystem) particleSystem.victoryConfetti();
+
+                // Offer screenshot after 2s
+                setTimeout(() => {
+                    if (window.SS) {
+                        const myIdx    = d.players.indexOf(myName);
+                        const spyIdxs  = d.spyIndices || [d.spyIdx];
+                        const spyNames = spyIdxs.map(i => d.players[i]);
+                        SS.capture({
+                            winner:   d.winner,
+                            word:     d.secret,
+                            category: d.category,
+                            players:  d.players.map((name, i) => ({
+                                name, role: spyIdxs.includes(i) ? 'spy' : 'innocent'
+                            })),
+                            myName,
+                            myRole: spyIdxs.includes(myIdx) ? 'spy' : 'innocent',
+                            myWon:  (d.winner === 'spy' && spyIdxs.includes(myIdx)) ||
+                                    (d.winner === 'innocents' && !spyIdxs.includes(myIdx))
+                        });
+                    }
+                }, 2000);
+            }, 500);
+
+            hideAllGameScreens();
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            const icon = document.getElementById('resultIcon');
+            const title = document.getElementById('resultTitle');
+            const message = document.getElementById('resultMessage');
+            
+            // Update stats for all players
+            updatePlayerStats(d);
+            
+            if(d.winner === 'spy') {
+                icon.innerText = '🕵️';
+                title.innerText = 'الجاسوس انتصر!';
+                message.innerText = `${d.spyName} نجح في المهمة!`;
+            } else {
+                icon.innerText = '🏆';
+                title.innerText = 'الأبرياء انتصروا!';
+                message.innerText = `تم كشف الجاسوس ${d.spyName}!`;
+            }
+            
+            document.getElementById('returnToRoomBtn').onclick = async () => {
+                hideAllGameScreens();
+                
+                await update(ref(db, 'rooms/' + myRoom), { 
+                    status: 'waiting',
+                    turn: 0,
+                    secret: null,
+                    spyIdx: null,
+                    suspects: {},
+                    discussionMessages: [],
+                    readyForVote: [],
+                    votes: {},
+                    tiedPlayers: null,
+                    spyGuess: null,
+                    winner: null,
+                    votedPlayer: null
+                });
+                
+                document.getElementById('room-overlay').classList.remove('hidden');
+            };
+        }
+
+        // Update player stats after game ends
+        // ── RANKS ───────────────────────────────────────
+        const RANKS = [
+            { name:'Bronze',   min:0,     max:999,   css:'rank-bronze' },
+            { name:'Silver',   min:1000,  max:2499,  css:'rank-silver' },
+            { name:'Gold',     min:2500,  max:4999,  css:'rank-gold'   },
+            { name:'Platinum', min:5000,  max:9999,  css:'rank-platinum'},
+            { name:'Diamond',  min:10000, max:Infinity, css:'rank-diamond'}
+        ];
+        function getRank(pts) { return RANKS.find(r => pts >= r.min && pts <= r.max) || RANKS[0]; }
+
+        // ── ACHIEVEMENTS ────────────────────────────────
+        const ACHIEVEMENTS = {
+            firstWin:       { name:'الفوز الأول',       check: s => (s.spyWins+s.innocentWins) >= 1   },
+            masterDeceiver: { name:'خبير الخداع',        check: s => s.spyWins >= 10                  },
+            eagleEye:       { name:'عين الصقر',          check: s => (s.correctVotes||0) >= 5          },
+            centuryClub:    { name:'نادي المئة',         check: s => s.totalGames >= 100              },
+            hotStreak:      { name:'سلسلة نارية',        check: s => (s.currentStreak||0) >= 5        },
+            diamondPlayer:  { name:'لاعب ألماسي',        check: (s,pts) => pts >= 10000               }
+        };
+
+        async function updatePlayerStats(gameData) {
+            const winner     = gameData.winner;
+            const spyIndices = gameData.spyIndices || [gameData.spyIdx];
+            const category   = gameData.category || 'عام';
+
+            // Only update stats for the current logged-in user (avoid quota issues)
+            if (!firebase_auth_user) return;
+            const uid = firebase_auth_user.uid;
+            const myIdx = gameData.players.indexOf(myName);
+            if (myIdx === -1) return;
+
+            const isSpy = spyIndices.includes(myIdx);
+            const won   = (isSpy && winner === 'spy') || (!isSpy && winner === 'innocents');
+
+            // Load current data
+            const snap = await get(ref(db, `players/${uid}`));
+            const data = snap.exists() ? snap.val() : {};
+            const s    = data.stats || {};
+            const currentPts = data.rankPoints || 0;
+
+            // ── BUILD NEW STATS ────────────────────────
+            const newStats = {
+                totalGames:       (s.totalGames       || 0) + 1,
+                spyWins:          (s.spyWins          || 0) + (isSpy && won ? 1 : 0),
+                innocentWins:     (s.innocentWins     || 0) + (!isSpy && won ? 1 : 0),
+                spyGames:         (s.spyGames         || 0) + (isSpy ? 1 : 0),
+                timesCaughtAsSpy: (s.timesCaughtAsSpy || 0) + (isSpy && !won ? 1 : 0),
+                currentStreak:    won ? (s.currentStreak || 0) + 1 : 0,
+                longestWinStreak: Math.max(s.longestWinStreak || 0, won ? (s.currentStreak || 0) + 1 : 0),
+                lastPlayed:       Date.now()
+            };
+
+            // ── COINS EARNED ──────────────────────────
+            let coinsEarned = 5; // participation
+            if (won)           coinsEarned += isSpy ? 50 : 20;
+            if (newStats.currentStreak >= 3) coinsEarned += newStats.currentStreak * 5;
+            const newCoins = (data.coins || 0) + coinsEarned;
+
+            // ── RANK POINTS ───────────────────────────
+            let ptsEarned = 10;
+            if (won) ptsEarned += isSpy ? 100 : 50;
+            if (newStats.currentStreak > 1) ptsEarned += newStats.currentStreak * 10;
+            const newPts  = currentPts + ptsEarned;
+            const newRank = getRank(newPts);
+            const oldRank = getRank(currentPts);
+
+            // ── CATEGORY STATS ────────────────────────
+            const catStats = data.categoryStats || {};
+            catStats[category] = (catStats[category] || 0) + 1;
+
+            // ── GAME HISTORY ──────────────────────────
+            const history = data.gameHistory || [];
+            history.push({ role: isSpy?'spy':'innocent', won, category, timestamp: Date.now() });
+            if (history.length > 50) history.splice(0, history.length - 50); // keep last 50
+
+            // ── ACHIEVEMENTS ──────────────────────────
+            const unlocked = data.achievements || {};
+            const newlyUnlocked = [];
+            for (const [id, ach] of Object.entries(ACHIEVEMENTS)) {
+                if (!unlocked[id] && ach.check(newStats, newPts)) {
+                    unlocked[id] = { timestamp: Date.now() };
+                    newlyUnlocked.push(ach.name);
+                    coinsEarned += 100; // bonus for achievement
+                }
+            }
+
+            // ── SAVE ALL ──────────────────────────────
+            const updates = {};
+            updates[`players/${uid}/stats`]        = newStats;
+            updates[`players/${uid}/coins`]        = newCoins;
+            updates[`players/${uid}/rankPoints`]   = newPts;
+            updates[`players/${uid}/rank`]         = newRank.name;
+            updates[`players/${uid}/categoryStats`]= catStats;
+            updates[`players/${uid}/gameHistory`]  = history;
+            updates[`players/${uid}/achievements`] = unlocked;
+            await update(ref(db), updates);
+
+            // ── NOTIFY PLAYER ─────────────────────────
+            setTimeout(() => {
+                // Coins notification
+                if (window.SND) SND.announce.coinsEarned(coinsEarned);
+                if (window.showToast) showToast('🪙 +' + coinsEarned + ' عملة  •  +' + ptsEarned + ' نقطة رتبة');
+
+                // Rank-up notification
+                if (newRank.name !== oldRank.name) {
+                    if (window.SND) SND.announce.rankUp(newRank.name);
+                    if (window.particleSystem) particleSystem.burst(40, 'particle-victory');
+                    setTimeout(() => showToast('🎉 ترقية! أصبحت ' + newRank.name), 2000);
+                }
+
+                // Achievement notifications
+                newlyUnlocked.forEach((name, i) => {
+                    setTimeout(() => {
+                        if (window.SND) SND.announce.achievement(name);
+                        if (window.showToast) showToast('🏆 إنجاز جديد: ' + name);
+                    }, (i + 1) * 3000);
+                });
+            }, 1500);
+        }
+
+        document.getElementById('roomCodeContainer').onclick = () => {
+            navigator.clipboard.writeText(myRoom)
+                .then(() => { if(window.showToast) showToast('📋 تم نسخ الكود: ' + myRoom); })
+                .catch(() => {});
+        };
+        // Add QR share button next to room code
+        const qrShareEl = document.getElementById('roomCodeContainer');
+        if (qrShareEl) {
+            const qrBtn = document.createElement('button');
+            qrBtn.innerHTML = '📲';
+            qrBtn.title = 'مشاركة QR';
+            qrBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:18px;margin-right:6px;';
+            qrBtn.onclick = (e) => { e.stopPropagation(); if(window.QR) QR.generate(myRoom); };
+            qrShareEl.appendChild(qrBtn);
+        }
+
+        // Initialize room
+        setupPresence(myRoom, myName);
+        initRoom();
+
+        // ── VOICE CHAT INIT ─────────────────────────
+        // Wait for firebase fns to be available then init voice chat
+        setTimeout(() => {
+            if (window.VoiceChat && firebase_auth_user) {
+                // Make Firebase functions available for voice chat signaling
+                window._firebaseFns = { ref, push, onChildAdded };
+                window.VC = new VoiceChat(db, myRoom, firebase_auth_user.uid, myName);
+            }
+        }, 2000);
+
+        // ── HINT SYSTEM ───────────────────────────────
+        async function loadHintBalance() {
+            if (!firebase_auth_user) return;
+            const snap = await get(ref(db, `players/${firebase_auth_user.uid}/hints`));
+            document.getElementById('hintBalance').innerText = snap.val() || 0;
+        }
+
+        window.useHint = async function() {
+            if (!firebase_auth_user) { alert('يجب تسجيل الدخول'); return; }
+            const snap = await get(ref(db, `players/${firebase_auth_user.uid}/hints`));
+            const bal  = snap.val() || 0;
+            if (bal < 1) { alert('ليس لديك تلميحات! اشترِ المزيد من المتجر.'); return; }
+            
+            const roomSnap = await get(ref(db, 'rooms/' + myRoom));
+            const d = roomSnap.val();
+            if (!d) return;
+
+            const spyIndices = d.spyIndices || [d.spyIdx];
+            const spyNames   = spyIndices.map(i => d.players[i]);
+            const innocents  = d.players.filter((_, i) => !spyIndices.includes(i));
+            
+            // Generate varied hints without revealing spy directly
+            const hintTypes = [
+                () => `الجاسوس${spyNames.length > 1 ? 'ون' : ''} ${spyNames.length > 1 ? 'في' : 'في'} قائمة اللاعبين`,
+                () => `ليس ${innocents[Math.floor(Math.random() * innocents.length)]} جاسوساً`,
+                () => `عدد الجواسيس: ${spyNames.length}`,
+                () => `الجاسوس ليس اللاعب رقم ${(innocents.indexOf(innocents[Math.floor(Math.random()*innocents.length)])) + 1 } في القائمة`,
+                () => `الكلمة السرية تبدأ بحرف "${d.secret ? d.secret[0] : '?'}"`,
+            ];
+
+            const hint = hintTypes[Math.floor(Math.random() * hintTypes.length)]();
+
+            // Deduct hint
+            await update(ref(db, `players/${firebase_auth_user.uid}`), { hints: bal - 1 });
+            document.getElementById('hintBalance').innerText = bal - 1;
+
+            // Show hint
+            document.getElementById('hint-display').classList.remove('hidden');
+            document.getElementById('hint-text').innerText = hint;
+
+            // Broadcast hint to room
+            await update(ref(db, 'rooms/' + myRoom), {
+                [`hints/${firebase_auth_user.uid}`]: { hint, usedAt: Date.now(), by: myName }
+            });
+
+            if (window.SND) SND.play('coins');
+        };
+
+        // Show any hints broadcast to room in discussion
+        function showRoomHints(d) {
+            if (!d.hints) return;
+            const vals = Object.values(d.hints);
+            if (!vals.length) return;
+            const last = vals[vals.length - 1];
+            document.getElementById('hint-display').classList.remove('hidden');
+            document.getElementById('hint-text').innerText = last.hint + ' (من ' + (last.by||'لاعب') + ')';
+        }
+
+    </script>
+</body>
+</html>
