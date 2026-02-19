@@ -305,13 +305,17 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
-            authDomain: "el-jasus.firebaseapp.com",
-            databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "el-jasus",
-            appId: "1:415659587906:web:782f7940176ea4097eb0db"
-        };
+        
+const firebaseConfig = {
+  apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+  authDomain: "el-jasus.firebaseapp.com",
+  databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "el-jasus",
+  storageBucket: "el-jasus.firebasestorage.app",
+  messagingSenderId: "415659587906",
+  appId: "1:415659587906:web:782f7940176ea4097eb0db",
+  measurementId: "G-N4K79FP56N"
+};
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
@@ -345,31 +349,31 @@
         });
 
         onValue(ref(db, 'rooms'), (snapshot) => {
-            // Count active games
-            const rooms = snapshot.val() || {};
-            const activeGames = Object.values(rooms).filter(r => r.status === 'playing').length;
-            const el = document.getElementById('active-game-count');
-            if (el) el.textContent = activeGames;
-            const rooms = snapshot.val();
-            allRooms = [];
-            
-            if (rooms) {
-                Object.keys(rooms).forEach(code => {
-                    const room = rooms[code];
-                    if (room.visibility === 'public' && room.status === 'waiting') {
-                        allRooms.push({
-                            code: code,
-                            category: room.category,
-                            playerCount: room.players ? room.players.length : 0,
-                            maxPlayers: 10,
-                            host: room.host
-                        });
-                    }
+    // Count active games
+    const rooms = snapshot.val() || {};
+    const activeGames = Object.values(rooms).filter(r => r.status === 'playing').length;
+    const el = document.getElementById('active-game-count');
+    if (el) el.textContent = activeGames;
+
+    allRooms = [];
+    
+    if (rooms) {
+        Object.keys(rooms).forEach(code => {
+            const room = rooms[code];
+            if (room.visibility === 'public' && room.status === 'waiting') {
+                allRooms.push({
+                    code: code,
+                    category: room.category,
+                    playerCount: room.players ? room.players.length : 0,
+                    maxPlayers: 10,
+                    host: room.host
                 });
             }
-            
-            applyFilters();
         });
+    }
+    
+    applyFilters();
+});
 
         // Apply filters and search
         function applyFilters() {
@@ -524,6 +528,12 @@
 
         // Join room function
         window.joinRoom = function(roomCode) {
+            const myName = localStorage.getItem('eljasus_user_name');
+            if (!myName) {
+                alert('يجب إدخال اسمك أولاً من الصفحة الرئيسية');
+                window.location.href = 'index.html';
+                return;
+            }
             localStorage.setItem('pendingRoomJoin', roomCode);
             localStorage.setItem('currentRoom', roomCode);
             window.location.href = 'room.html';
