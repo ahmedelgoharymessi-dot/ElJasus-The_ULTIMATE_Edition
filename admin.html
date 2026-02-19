@@ -13,7 +13,7 @@
     <style>
         :root{--primary:#00f2ff;--secondary:#7c30ff;--bg:#0a0e1a;}
         *{box-sizing:border-box;}
-        body{font-family:'Cairo',sans-serif;background:var(--bg);color:#fff;min-height:100vh;display:flex;overflow:hidden;}
+        body{font-family:'Cairo',sans-serif;background:var(--bg);color:#fff;min-height:100vh;display:flex;overflow:auto;}
         /* Sidebar */
         #admin-sidebar{width:220px;flex-shrink:0;background:linear-gradient(180deg,rgba(15,20,35,.98),rgba(10,14,26,.98));
             border-left:2px solid rgba(0,242,255,.15);display:flex;flex-direction:column;padding:20px 0;
@@ -259,7 +259,7 @@
                     <h3 style="font-size:14px;font-weight:900;">كلمات الفئة: <span id="active-cat-name" style="color:#a855f7;">—</span></h3>
                     <span id="word-count" style="font-size:11px;color:#666;"></span>
                 </div>
-                <div id="words-cloud" style="min-height:100px;margin-bottom:16px;"></div>
+                <div id="words-cloud" style="min-height:100px;max-height:420px;overflow-y:auto;margin-bottom:16px;padding-right:4px;"></div>
                 <div class="flex gap-3">
                     <input id="new-word" class="admin-input" type="text" placeholder="كلمة جديدة">
                     <button class="btn-primary" onclick="addWord()" style="white-space:nowrap;">+ إضافة</button>
@@ -398,11 +398,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebas
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import { getDatabase, ref, get, set, update, remove, push, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
+
 const firebaseConfig = {
-    apiKey:"AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
-    authDomain:"el-jasus.firebaseapp.com",
-    databaseURL:"https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId:"el-jasus", appId:"1:415659587906:web:782f7940176ea4097eb0db"
+  apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+  authDomain: "el-jasus.firebaseapp.com",
+  databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "el-jasus",
+  storageBucket: "el-jasus.firebasestorage.app",
+  messagingSenderId: "415659587906",
+  appId: "1:415659587906:web:782f7940176ea4097eb0db",
+  measurementId: "G-N4K79FP56N"
 };
 
 const app  = initializeApp(firebaseConfig);
