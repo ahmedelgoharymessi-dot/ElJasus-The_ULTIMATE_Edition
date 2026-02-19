@@ -361,18 +361,37 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
         import { getDatabase, ref, set, onValue, update, get, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
-            authDomain: "el-jasus.firebaseapp.com",
-            databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "el-jasus",
-            appId: "1:415659587906:web:782f7940176ea4097eb0db"
-        };
-
+        
+const firebaseConfig = {
+  apiKey: "AIzaSyDnd-pmKEatI3DaFz6xHWB5ucurtHXt9tk",
+  authDomain: "el-jasus.firebaseapp.com",
+  databaseURL: "https://el-jasus-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "el-jasus",
+  storageBucket: "el-jasus.firebasestorage.app",
+  messagingSenderId: "415659587906",
+  appId: "1:415659587906:web:782f7940176ea4097eb0db",
+  measurementId: "G-N4K79FP56N"
+};
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getDatabase(app);
+
+        // Auth state - used for stat tracking and hints
+        // Also gates initRoom() so RTDB reads are authenticated
+        let firebase_auth_user = null;
+        let _roomInitialized = false;
+
+        onAuthStateChanged(auth, (user) => {
+            firebase_auth_user = user;
+            // Only init once, after auth is confirmed (even if null = guest)
+            if (!_roomInitialized) {
+                _roomInitialized = true;
+                joinPendingAndInit();
+            }
+        });
 
         const gameData = {
             places: [
@@ -447,26 +466,49 @@
             myRoom = pendingRoom;
             localStorage.removeItem('pendingRoomJoin');
             localStorage.setItem('currentRoom', myRoom);
-            
-            // Join the room
-            (async () => {
-                const snap = await get(ref(db, 'rooms/' + myRoom));
-                if(snap.exists()) {
-                    const d = snap.val();
-                    if(!d.players.includes(myName)) {
-                        if(d.players.length < 10) {
-                            await update(ref(db, 'rooms/' + myRoom), { players: [...d.players, myName] });
-                        }
-                    }
-                    isHost = false;
-                    localStorage.setItem('isHost', 'false');
-                }
-            })();
         }
 
         // Redirect if no room found
         if (!myRoom || !myName) {
             window.location.href = 'index.html';
+        }
+
+        // Helper: safely convert Firebase players (may be object or array) to array
+        function toArray(val) {
+            if (!val) return [];
+            if (Array.isArray(val)) return val;
+            return Object.values(val);
+        }
+
+        // Join pending room if needed, then init
+        async function joinPendingAndInit() {
+            if (pendingRoom) {
+                try {
+                    const snap = await get(ref(db, 'rooms/' + myRoom));
+                    if (snap.exists()) {
+                        const d = snap.val();
+                        const players = toArray(d.players);
+                        if (!players.includes(myName)) {
+                            if (players.length < 10) {
+                                await update(ref(db, 'rooms/' + myRoom), { players: [...players, myName] });
+                            }
+                        }
+                        isHost = false;
+                        localStorage.setItem('isHost', 'false');
+                    } else {
+                        alert('الغرفة غير موجودة');
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                } catch(e) {
+                    console.error('Failed to join pending room:', e);
+                    alert('فشل الانضمام للغرفة: ' + e.message);
+                    window.location.href = 'index.html';
+                    return;
+                }
+            }
+            setupPresence(myRoom, myName);
+            initRoom();
         }
 
         function hideAllGameScreens() {
@@ -493,7 +535,7 @@
                             if (data.host === playerName) {
                                 onDisconnect(roomRef).remove();
                             } else {
-                                let updatedPlayers = data.players.map(p => 
+                                let updatedPlayers = toArray(data.players).map(p => 
                                     p === playerName ? `${playerName} (خامل)` : p
                                 );
                                 onDisconnect(ref(db, `rooms/${roomCode}/players`)).set(updatedPlayers);
@@ -508,21 +550,21 @@
             const roomRef = ref(db, 'rooms/' + myRoom);
             
             onValue(roomRef, (snap) => {
-                const d = snap.val();
+                let d;
+                try { d = snap.val(); } catch(e) { console.error('Room read error:', e); return; }
                 if(!d) { 
                     localStorage.removeItem('currentRoom');
                     localStorage.removeItem('isHost');
                     window.location.href = 'index.html';
                     return; 
                 }
-
-                if (d.players && d.players.includes(`${myName} (خامل)`)) {
-                    let restoredPlayers = d.players.map(p => p === `${myName} (خامل)` ? myName : p);
+                if (d.players && toArray(d.players).includes(`${myName} (خامل)`)) {
+                    let restoredPlayers = toArray(d.players).map(p => p === `${myName} (خامل)` ? myName : p);
                     update(ref(db, 'rooms/' + myRoom), { players: restoredPlayers });
                     return;
                 }
                 
-                if(!d.players.includes(myName)) {
+                if(!toArray(d.players).includes(myName)) {
                     alert("تم طردك من الغرفة");
                     localStorage.removeItem('currentRoom');
                     localStorage.removeItem('isHost');
@@ -531,7 +573,7 @@
                 }
 
                 document.getElementById('displayRoomCode').innerText = myRoom;
-                const pCount = d.players.length;
+                const pCount = toArray(d.players).length;
                 document.getElementById('pCount').innerText = `${pCount}/10`;
                 
                 isHost = (d.host === myName);
@@ -561,7 +603,7 @@
                     document.getElementById('minPlayersMsg').classList.add('hidden');
                 }
 
-                document.getElementById('roomPlayersList').innerHTML = d.players.map(p => {
+                document.getElementById('roomPlayersList').innerHTML = toArray(d.players).map(p => {
                     const isMe = (p === myName);
                     const isTargetHost = (p === d.host);
                     const isIdle = p.includes("(خامل)");
@@ -607,7 +649,7 @@
         }
 
         async function handleLeave(data, nameToLeave) {
-            let players = data.players.filter(p => p !== nameToLeave);
+            let players = toArray(data.players).filter(p => p !== nameToLeave);
             if(players.length === 0) {
                 await remove(ref(db, 'rooms/' + myRoom));
             } else {
@@ -623,7 +665,7 @@
             const snap = await get(ref(db, 'rooms/' + myRoom));
             if(snap.exists()) {
                 const d = snap.val();
-                const newPlayers = d.players.filter(p => p !== targetName);
+                const newPlayers = toArray(d.players).filter(p => p !== targetName);
                 await update(ref(db, 'rooms/' + myRoom), { players: newPlayers });
             }
         };
@@ -658,10 +700,10 @@
             
             const secret = gameData[d.category][Math.floor(Math.random() * gameData[d.category].length)];
             // MULTIPLE SPIES: 1 for <8 players, 2 for 8+, 3 for 12+
-            const spyCount = d.players.length >= 12 ? 3 : d.players.length >= 8 ? 2 : 1;
+            const spyCount = toArray(d.players).length >= 12 ? 3 : toArray(d.players).length >= 8 ? 2 : 1;
             const spyIndices = [];
             while (spyIndices.length < spyCount) {
-                const idx = Math.floor(Math.random() * d.players.length);
+                const idx = Math.floor(Math.random() * toArray(d.players).length);
                 if (!spyIndices.includes(idx)) spyIndices.push(idx);
             }
             update(ref(db, 'rooms/' + myRoom), { 
@@ -699,7 +741,7 @@
             btn.classList.add('hidden');
 
             card.onclick = () => {
-                if((d.spyIndices || [d.spyIdx]).includes(d.players.indexOf(myName))) {
+                if((d.spyIndices || [d.spyIdx]).includes(toArray(d.players).indexOf(myName))) {
                     card.classList.add('reveal-spy');
                     card.innerHTML = `<i class="fas fa-user-secret text-8xl mb-4"></i><h2 class="text-4xl font-black italic">جاسوس</h2>`;
                     if(window.SND) SND.announce.spyReveal();
@@ -715,7 +757,7 @@
             };
 
             btn.onclick = () => {
-                if(d.turn + 1 >= d.players.length) {
+                if(d.turn + 1 >= toArray(d.players).length) {
                     update(ref(db, 'rooms/' + myRoom), { 
                         status: 'discussion',
                         suspects: {},
@@ -753,8 +795,7 @@
             // Show any existing room hints
             showRoomHints(d);
             
-            const suspectsList = document.getElementById('suspectsList');
-            suspectsList.innerHTML = d.players.map(p => {
+            suspectsList.innerHTML = toArray(d.players).map(p => {
                 const suspectCount = d.suspects && d.suspects[p] ? d.suspects[p].length : 0;
                 const isSuspect = d.suspects && d.suspects[p] && d.suspects[p].includes(myName);
                 return `
@@ -778,7 +819,7 @@
             }
 
             const readyCount = d.readyForVote ? d.readyForVote.length : 0;
-            document.getElementById('discussionInfo').innerText = `${readyCount}/${d.players.length} لاعب جاهز للتصويت`;
+            document.getElementById('discussionInfo').innerText = `${readyCount}/${toArray(d.players).length} لاعب جاهز للتصويت`;
             
             const goVoteBtn = document.getElementById('goVoteBtn');
             const isReady = d.readyForVote && d.readyForVote.includes(myName);
@@ -813,7 +854,7 @@
                 await update(ref(db, 'rooms/' + myRoom), { readyForVote: ready });
             }
             
-            if(ready.length >= d.players.length) {
+            if(ready.length >= toArray(d.players).length) {
                 await update(ref(db, 'rooms/' + myRoom), { 
                     status: 'voting',
                     votes: {}
@@ -857,7 +898,7 @@
             const hasVoted = d.votes && d.votes[myName];
             const voteCards = document.getElementById('voteCards');
             
-            voteCards.innerHTML = d.players.map(p => {
+            voteCards.innerHTML = toArray(d.players).map(p => {
                 const voteCount = Object.values(d.votes || {}).filter(v => v === p).length;
                 const isMyVote = d.votes && d.votes[myName] === p;
                 return `
@@ -873,7 +914,7 @@
             }).join('');
 
             const votedCount = Object.keys(d.votes || {}).length;
-            document.getElementById('votingStatus').innerText = `${votedCount}/${d.players.length} لاعب قام بالتصويت`;
+            document.getElementById('votingStatus').innerText = `${votedCount}/${toArray(d.players).length} لاعب قام بالتصويت`;
         }
 
         window.castVote = async (targetPlayer) => {
@@ -887,14 +928,14 @@
             
             await update(ref(db, 'rooms/' + myRoom), { votes });
             
-            if(Object.keys(votes).length >= d.players.length) {
+            if(Object.keys(votes).length >= toArray(d.players).length) {
                 processVotes(d, votes);
             }
         };
 
         async function processVotes(d, votes) {
             const voteCounts = {};
-            d.players.forEach(p => voteCounts[p] = 0);
+            toArray(d.players).forEach(p => voteCounts[p] = 0);
             Object.values(votes).forEach(v => voteCounts[v]++);
             
             const maxVotes = Math.max(...Object.values(voteCounts));
@@ -1021,14 +1062,14 @@
                 // Offer screenshot after 2s
                 setTimeout(() => {
                     if (window.SS) {
-                        const myIdx    = d.players.indexOf(myName);
+                        const myIdx    = toArray(d.players).indexOf(myName);
                         const spyIdxs  = d.spyIndices || [d.spyIdx];
                         const spyNames = spyIdxs.map(i => d.players[i]);
                         SS.capture({
                             winner:   d.winner,
                             word:     d.secret,
                             category: d.category,
-                            players:  d.players.map((name, i) => ({
+                            players:  toArray(d.players).map((name, i) => ({
                                 name, role: spyIdxs.includes(i) ? 'spy' : 'innocent'
                             })),
                             myName,
@@ -1219,9 +1260,8 @@
             qrShareEl.appendChild(qrBtn);
         }
 
-        // Initialize room
-        setupPresence(myRoom, myName);
-        initRoom();
+        // Room initialization is triggered by onAuthStateChanged above
+        // to ensure Firebase auth token is ready before RTDB reads
 
         // ── VOICE CHAT INIT ─────────────────────────
         // Wait for firebase fns to be available then init voice chat
@@ -1252,7 +1292,7 @@
 
             const spyIndices = d.spyIndices || [d.spyIdx];
             const spyNames   = spyIndices.map(i => d.players[i]);
-            const innocents  = d.players.filter((_, i) => !spyIndices.includes(i));
+            const innocents  = toArray(d.players).filter((_, i) => !spyIndices.includes(i));
             
             // Generate varied hints without revealing spy directly
             const hintTypes = [
