@@ -1290,7 +1290,7 @@
         // Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-        import { getDatabase, ref, set, onValue, update, get, remove, onDisconnect } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, update, get, remove, onDisconnect, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js";
 
        
 const firebaseConfig = {
@@ -1312,15 +1312,13 @@ const firebaseConfig = {
         // Track auth state so Firebase SDK knows the user is logged in
         let currentUser = null;
         onAuthStateChanged(auth, async (user) => {
-            await MOD.init(db, user);
-            if (document.getElementById('_ej_ban')) return;
-            currentUser = user;
-            // Init moderation system and check ban on every load
-            if (window.MOD) {
-                MOD.init(db, user ? user.uid : null, ref, update, get);
-                MOD.checkOnLoad(); // shows ban screen if banned
-            }
-        });
+    window._firebaseFns = { ref, get, update, onValue, push, serverTimestamp };
+    if (window.MOD) {
+        await MOD.init(db, user);
+        if (document.getElementById('_ej_ban')) return;
+    }
+    currentUser = user;
+});
 
         const gameData = {
             places: [
@@ -1441,20 +1439,17 @@ const firebaseConfig = {
         }
         renderLocalInputs();
 
-        window.startLocalGame = () => {
-            // ── BAN CHECK ─────────────────────────────────
-            if (window.MOD) {
-            (async () => {
-                const ban = await MOD.checkBan();
-                if (ban) { MOD.checkOnLoad(); return; }
-            })();
-        }
-            const names = Array.from(document.querySelectorAll('.local-name-in')).map(i => i.value || "مجهول");
-            const cat = document.getElementById('gameCat').value;
-            const secret = gameData[cat][Math.floor(Math.random() * gameData[cat].length)];
-            const spyIdx = Math.floor(Math.random() * names.length);
-            showLocalTurn(names, secret, spyIdx, 0);
-        };
+       window.startLocalGame = async () => {
+    if (window.MOD) {
+        const ban = await MOD.checkBan?.();
+        if (ban) { MOD.checkOnLoad(); return; }
+    }
+    const names = Array.from(document.querySelectorAll('.local-name-in')).map(i => i.value || "مجهول");
+    const cat = document.getElementById('gameCat').value;
+    const secret = gameData[cat][Math.floor(Math.random() * gameData[cat].length)];
+    const spyIdx = Math.floor(Math.random() * names.length);
+    showLocalTurn(names, secret, spyIdx, 0);
+};
 
         function showLocalTurn(names, secret, spyIdx, idx) {
             document.getElementById('setup-screen').classList.add('hidden');
