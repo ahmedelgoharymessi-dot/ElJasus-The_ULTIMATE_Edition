@@ -367,6 +367,63 @@
             from { opacity: 0; transform: translateY(30px); }
             to   { opacity: 1; transform: translateY(0); }
         }
+
+        .community-link {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            font-weight: 900;
+            font-family: 'Cairo', sans-serif;
+            color: #00f2ff;
+            text-decoration: none;
+            padding: 1px 6px 1px 4px;
+            border-radius: 5px;
+            background: rgba(0, 242, 255, 0.07);
+            border: 1px solid rgba(0, 242, 255, 0.25);
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .community-link::before {
+            content: '🛡️';
+            font-size: 11px;
+            line-height: 1;
+        }
+
+        .link-underline {
+            position: absolute;
+            bottom: -1px;
+            right: 0;
+            height: 1px;
+            width: 0%;
+            background: linear-gradient(90deg, transparent, #00f2ff);
+            border-radius: 99px;
+            transition: width 0.3s ease;
+        }
+
+        .community-link:hover {
+            color: #fff;
+            background: rgba(0, 242, 255, 0.15);
+            border-color: rgba(0, 242, 255, 0.6);
+            box-shadow: 0 0 12px rgba(0, 242, 255, 0.3), inset 0 0 10px rgba(0, 242, 255, 0.05);
+        }
+
+        .community-link:hover .link-underline {
+            width: 100%;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
     </style>
 </head>
 <body>
@@ -409,11 +466,14 @@
                     </span>
                 </label>
 
-                <!-- Stay signed-in -->
                 <label class="checkbox-container">
-                    <input type="checkbox" id="forgot_password">
+                    <input type="checkbox" id="dontShowAgain" required>
                     <span class="custom-checkbox"></span>
-                    <span class="checkbox-label">ابقني مسجلاً</span>
+                    <span class="checkbox-label">أوافق على </span>
+                    <a href="community.html" class="community-link">
+                        شروط و معايير المجتمع
+                        <span class="link-underline"></span>
+                    </a>
                 </label>
 
                 <button type="submit" class="btn-primary" id="loginBtn">
@@ -482,59 +542,102 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        /* ════════════════════════════════════════════════════════════════
-           Helper: create or patch the player record in Realtime Database
-           so that username is NEVER undefined for leaderboard / admin panel.
-           Called after both email login AND Google login.
-        ════════════════════════════════════════════════════════════════ */
+        /* ══════════════════════════════════════════════════════════════
+           _firebaseFns — used by moderation.js (compat SDK adapter)
+        ══════════════════════════════════════════════════════════════ */
+        window._firebaseFns = {
+            ref:             (db, path) => firebase.database().ref(path),
+            get:             (r)        => r.once('value'),
+            update:          (r, v)     => r.update(v),
+            onValue:         (r, cb)    => { r.on('value', snap => cb(snap)); return () => r.off('value'); },
+            serverTimestamp: ()         => firebase.database.ServerValue.TIMESTAMP,
+        };
+
+        /* ══════════════════════════════════════════════════════════════
+           ensurePlayerRecord — creates or patches the player DB record
+        ══════════════════════════════════════════════════════════════ */
         async function ensurePlayerRecord(user) {
-        try {
-            const { getDatabase, ref, get, update } =
-                await import("https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js");
+            try {
+                const { getDatabase, ref, get, update } =
+                    await import("https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js");
 
-            const db   = getDatabase();
-            const snap = await get(ref(db, `players/${user.uid}`));
-            const prev = snap.exists() ? snap.val() : {};
+                const db   = getDatabase();
+                const snap = await get(ref(db, `players/${user.uid}`));
+                const prev = snap.exists() ? snap.val() : {};
 
-            const patch = {};
-            if (!prev.username)    patch.username    = user.displayName || 'Agent';
-            if (!prev.email)       patch.email       = user.email || '';
-            if (prev.coins       == null) patch.coins       = 100;
-            if (prev.hints       == null) patch.hints       = 3;
-            if (prev.rankPoints  == null) patch.rankPoints  = 0;
-            if (!prev.rank)        patch.rank        = 'Bronze';
-            if (!prev.activeTheme) patch.activeTheme = 'cyan';
-            if (!prev.activeTitle) patch.activeTitle = 'rookie';
-            if (!prev.inventory)   patch.inventory   = { themes: ['cyan'], titles: ['rookie'] };
-            if (!prev.stats)       patch.stats       = {
-                totalGames: 0, spyWins: 0, innocentWins: 0,
-                currentStreak: 0, longestWinStreak: 0
-            };
-            if (!prev.createdAt) patch.createdAt = Date.now();
+                const patch = {};
+                if (!prev.username)              patch.username    = user.displayName || 'Agent';
+                if (!prev.email)                 patch.email       = user.email || '';
+                if (prev.coins       == null)    patch.coins       = 100;
+                if (prev.hints       == null)    patch.hints       = 3;
+                if (prev.rankPoints  == null)    patch.rankPoints  = 0;
+                if (!prev.rank)                  patch.rank        = 'Bronze';
+                if (!prev.activeTheme)           patch.activeTheme = 'cyan';
+                if (!prev.activeTitle)           patch.activeTitle = 'rookie';
+                if (!prev.inventory)             patch.inventory   = { themes: ['cyan'], titles: ['rookie'] };
+                if (!prev.stats)                 patch.stats       = {
+                    totalGames: 0, spyWins: 0, innocentWins: 0,
+                    currentStreak: 0, longestWinStreak: 0
+                };
+                if (!prev.createdAt)             patch.createdAt   = Date.now();
+                if (prev.moderationWarnings == null) patch.moderationWarnings = 0;
+                if (prev.totalBans          == null) patch.totalBans          = 0;
 
-            // ── NEW: moderation fields — always ensure these exist ──
-            if (prev.moderationWarnings == null) patch.moderationWarnings = 0;
-            if (prev.totalBans          == null) patch.totalBans          = 0;
-            // ────────────────────────────────────────────────────────
-
-            if (Object.keys(patch).length > 0) {
-                await update(ref(db, `players/${user.uid}`), patch);
+                if (Object.keys(patch).length > 0) {
+                    await update(ref(db, `players/${user.uid}`), patch);
+                }
+            } catch (e) {
+                console.warn('[ensurePlayerRecord]', e.message);
             }
-        } catch (e) {
-            console.warn('[ensurePlayerRecord]', e.message);
         }
-    }
 
-        /* ════════════════════════════════════════════════════════════════
+        /* ══════════════════════════════════════════════════════════════
+           giveDailyReward — +10 coins once per day
+        ══════════════════════════════════════════════════════════════ */
+        async function giveDailyReward(user) {
+            const today = new Date().toDateString();
+            if (localStorage.getItem('eljasus_last_login') === today) return;
+            localStorage.setItem('eljasus_last_login', today);
+            try {
+                const { getDatabase, ref, get, update } =
+                    await import("https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js");
+                const db   = getDatabase();
+                const snap = await get(ref(db, `players/${user.uid}/coins`));
+                await update(ref(db, `players/${user.uid}`), {
+                    coins: (snap.val() || 0) + 10,
+                    lastDailyLogin: Date.now()
+                });
+                localStorage.setItem('eljasus_daily_reward', '10');
+            } catch (e) {}
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+           modCheck — run ban check then redirect if not banned
+        ══════════════════════════════════════════════════════════════ */
+        async function modCheck(user, redirectTo) {
+            if (window.MOD) {
+                await MOD.init(firebase.database(), user);
+                if (document.getElementById('_ej_ban')) return; // banned — stop
+            }
+            window.location.href = redirectTo;
+        }
+
+        /* ══════════════════════════════════════════════════════════════
            EMAIL / PASSWORD LOGIN
-        ════════════════════════════════════════════════════════════════ */
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+           FIX: was reading document.getElementById('forgot_password')
+                which doesn't exist → TypeError → button did nothing.
+                Correct ID is 'dontShowAgain'.
+        ══════════════════════════════════════════════════════════════ */
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const email        = document.getElementById('username').value.trim();
-            const password     = document.getElementById('password').value;
-            const keepSignedIn = document.getElementById('forgot_password').checked;
-            const loginBtn     = document.getElementById('loginBtn');
+            const email    = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            // FIX: correct checkbox ID ('forgot_password' → 'dontShowAgain')
+            const keepSignedIn = document.getElementById('dontShowAgain').checked;
+
+            const loginBtn = document.getElementById('loginBtn');
 
             if (!email)    { alert('الرجاء إدخال البريد الإلكتروني'); return; }
             if (!password) { alert('الرجاء إدخال كلمة المرور'); return; }
@@ -545,84 +648,42 @@
             loginBtn.innerHTML = '<span style="position:relative;z-index:1;">جاري التحقق...</span>';
             loginBtn.disabled  = true;
 
-            const persistence = keepSignedIn
-                ? firebase.auth.Auth.Persistence.LOCAL
-                : firebase.auth.Auth.Persistence.SESSION;
+            try {
+                const persistence = keepSignedIn
+                    ? firebase.auth.Auth.Persistence.LOCAL
+                    : firebase.auth.Auth.Persistence.SESSION;
 
-            auth.setPersistence(persistence)
-                .then(() => auth.signInWithEmailAndPassword(email, password))
-                .then(async (cred) => {
-                    const user = cred.user;
-                    localStorage.setItem('eljasus_user_name',  user.displayName || 'Agent');
-                    localStorage.setItem('eljasus_user_email', user.email);
+                await auth.setPersistence(persistence);
+                const cred = await auth.signInWithEmailAndPassword(email, password);
+                const user = cred.user;
 
-                    // Ensure DB record exists (covers Google-then-email edge cases)
-                    await ensurePlayerRecord(user);
+                localStorage.setItem('eljasus_user_name',  user.displayName || 'Agent');
+                localStorage.setItem('eljasus_user_email', user.email);
 
-                    // Daily login reward
-                    const today = new Date().toDateString();
-                    if (localStorage.getItem('eljasus_last_login') !== today) {
-                        localStorage.setItem('eljasus_last_login', today);
-                        import("https://www.gstatic.com/firebasejs/12.7.0/firebase-database.js")
-                            .then(async ({ getDatabase, ref, get, update }) => {
-                                try {
-                                    const db   = getDatabase();
-                                    const snap = await get(ref(db, `players/${user.uid}/coins`));
-                                    await update(ref(db, `players/${user.uid}`), {
-                                        coins: (snap.val() || 0) + 10,
-                                        lastDailyLogin: Date.now()
-                                    });
-                                    localStorage.setItem('eljasus_daily_reward', '10');
-                                } catch(err) {}
-                            });
-                    }
+                await ensurePlayerRecord(user);
+                await giveDailyReward(user);
 
-                    (async () => {
-                    // Init MOD with compat database
-                    if (window.MOD) {
-                        const db = firebase.database();
-                        // Set up _firebaseFns for compat SDK so MOD can use it
-                        window._firebaseFns = {
-                            ref:      (db, path) => firebase.database().ref(path),
-                            get:      (r)        => r.once('value'),
-                            update:   (r, v)     => r.update(v),
-                            onValue:  (r, cb)    => { r.on('value', snap => cb(snap)); return () => r.off('value'); },
-                            serverTimestamp: ()  => firebase.database.ServerValue.TIMESTAMP,
-                        };
-                        await MOD.init(db, user);
-                        // If banned → ban screen is showing — don't redirect
-                        if (document.getElementById('_ej_ban')) return;
-                    }
-                    window.location.href = 'index.html';
-                })();
+                // FIX: was an un-awaited IIFE — redirect could fire before ban check
+                await modCheck(user, 'index.html');
 
-                })
-                .catch((error) => {
-                    const msgs = {
-                        'auth/invalid-login-credentials': 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
-                        'auth/wrong-password':            'البريد الإلكتروني أو كلمة المرور غير صحيحة',
-                        'auth/user-not-found':            'لا يوجد حساب بهذا البريد الإلكتروني',
-                        'auth/invalid-email':             'البريد الإلكتروني غير صالح',
-                        'auth/user-disabled':             'هذا الحساب معطل',
-                        'auth/too-many-requests':         'تم حظر الحساب مؤقتاً. حاول لاحقاً',
-                    };
-                    alert(msgs[error.code] || 'فشل تسجيل الدخول: ' + error.message);
-                    loginBtn.innerHTML = '<span style="position:relative;z-index:1;">تسجيل الدخول</span>';
-                    loginBtn.disabled  = false;
-                });
+            } catch (error) {
+                const msgs = {
+                    'auth/invalid-login-credentials': 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+                    'auth/wrong-password':            'البريد الإلكتروني أو كلمة المرور غير صحيحة',
+                    'auth/user-not-found':            'لا يوجد حساب بهذا البريد الإلكتروني',
+                    'auth/invalid-email':             'البريد الإلكتروني غير صالح',
+                    'auth/user-disabled':             'هذا الحساب معطل',
+                    'auth/too-many-requests':         'تم حظر الحساب مؤقتاً. حاول لاحقاً',
+                };
+                alert(msgs[error.code] || 'فشل تسجيل الدخول: ' + error.message);
+                loginBtn.innerHTML = '<span style="position:relative;z-index:1;">تسجيل الدخول</span>';
+                loginBtn.disabled  = false;
+            }
         });
 
-        /* ════════════════════════════════════════════════════════════════
+        /* ══════════════════════════════════════════════════════════════
            GOOGLE LOGIN
-           FIX 1: The original code had TWO auth.signInWithPopup() calls:
-             • One inside the click handler (correct)
-             • One OUTSIDE the click handler, which fired a popup on every
-               single page load – breaking the login page for all visitors.
-           FIX 2: After sign-in we now call ensurePlayerRecord() which
-             writes username / default fields to the DB if they are missing.
-             This stops Google users appearing as "undefined" in the
-             leaderboard and in the admin players table.
-        ════════════════════════════════════════════════════════════════ */
+        ══════════════════════════════════════════════════════════════ */
         document.addEventListener('DOMContentLoaded', function () {
             const googleBtn = document.getElementById('googleLoginBtn');
             if (!googleBtn) return;
@@ -632,30 +693,17 @@
 
                 try {
                     const provider = new firebase.auth.GoogleAuthProvider();
-                    const result   = await auth.signInWithPopup(provider);  // ← only ONE popup call
+                    const result   = await auth.signInWithPopup(provider);
                     const user     = result.user;
 
                     localStorage.setItem('eljasus_user_name',  user.displayName || 'Agent');
                     localStorage.setItem('eljasus_user_email', user.email || '');
 
-                    // Create / patch player DB record (FIX 2)
                     await ensurePlayerRecord(user);
-
-                    if (window.MOD) {
-                    window._firebaseFns = {
-                        ref:      (db, path) => firebase.database().ref(path),
-                        get:      (r)        => r.once('value'),
-                        update:   (r, v)     => r.update(v),
-                        onValue:  (r, cb)    => { r.on('value', snap => cb(snap)); return () => r.off('value'); },
-                        serverTimestamp: ()  => firebase.database.ServerValue.TIMESTAMP,
-                    };
-                    await MOD.init(firebase.database(), user);
-                    if (document.getElementById('_ej_ban')) return;
-                }
-                window.location.href = 'index.html';
+                    await giveDailyReward(user);
+                    await modCheck(user, 'index.html');
 
                 } catch (err) {
-                    // Silently ignore user-dismissed popup
                     if (err.code !== 'auth/popup-closed-by-user' &&
                         err.code !== 'auth/cancelled-popup-request') {
                         alert('فشل تسجيل الدخول عبر Google: ' + err.message);
