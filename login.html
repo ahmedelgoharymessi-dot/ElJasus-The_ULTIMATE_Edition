@@ -17,6 +17,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="moderation.js"></script>
+    <link rel="stylesheet" href="mobile.css">
+    <script src="sound-system.js" defer></script>
+    <script src="qr-notifications.js" defer></script>
+    <script src="dialogs.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -712,11 +716,6 @@
             });
         });
     </script>
-
-    <link rel="stylesheet" href="mobile.css">
-    <script src="sound-system.js" defer></script>
-    <script src="qr-notifications.js" defer></script>
-    <script src="dialogs.js"></script>
     <script>
         window.alert   = (msg)             => UIAlert(msg);
         window.confirm = (msg)             => UIConfirm(msg);

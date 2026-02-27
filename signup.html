@@ -15,6 +15,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <link rel="stylesheet" href="mobile.css">
+    <script src="sound-system.js" defer></script>
+    <script src="qr-notifications.js" defer></script>
+    <script src="dialogs.js"></script>
+    <script src="moderation.js"></script>
 
     <style>
         * {
@@ -494,7 +499,7 @@
                 </label>
                 
                 <label class="checkbox-container">
-                    <input type="checkbox" id="dontShowAgain" required>
+                    <input type="checkbox" required>
                     <span class="custom-checkbox"></span>
                     <span class="checkbox-label">أوافق على </span>
                     <a href="community.html" class="community-link">
@@ -607,7 +612,7 @@
                     }
                     
                     await MOD.init(db, user);
-                    
+
                     // ── STEP 3: Redirect ──────────────────────────────────────
                     localStorage.setItem('eljasus_user_name', usernameValue);
                     localStorage.setItem('eljasus_welcome', '1');
@@ -645,17 +650,11 @@
                 });
         });
     </script>
-
-    <link rel="stylesheet" href="mobile.css">
-    <script src="sound-system.js" defer></script>
-    <script src="qr-notifications.js" defer></script>
-    <script src="dialogs.js"></script>
     <script>
         window.alert   = (msg)             => UIAlert(msg);
         window.confirm = (msg)             => UIConfirm(msg);
         window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
     </script>
     <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
-    <script src="moderation.js"></script>
 </body>
 </html>

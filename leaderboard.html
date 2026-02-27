@@ -15,7 +15,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="mobile.css">
+    <script src="sound-system.js" defer></script>
+    <script src="qr-notifications.js" defer></script>
+    <script src="dialogs.js"></script>
     <style>
         :root { 
             --bg-color: #0a0e1a;
@@ -705,16 +708,11 @@ const firebaseConfig = {
                 </div>
             </div>
         </div>
-    <link rel="stylesheet" href="mobile.css">
-    <script src="sound-system.js" defer></script>
-    <script src="qr-notifications.js" defer></script>
-    <script src="dialogs.js"></script>
 <script>
     window.alert   = (msg)             => UIAlert(msg);
     window.confirm = (msg)             => UIConfirm(msg);
     window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
 </script>
     <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}</script>
-    <script src="moderation.js"></script>
 </body>
 </html>

@@ -20,7 +20,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <script src="dialogs.js"></script>
+    <script src="moderation.js"></script>
+
+
     <style>
         :root { 
             --bg-color: #0a0e1a;
@@ -1232,12 +1235,10 @@ const firebaseConfig = {
             document.getElementById('hint-text').innerText = last.hint + ' (من ' + (last.by||'لاعب') + ')';
         }
     </script>
-    <script src="dialogs.js"></script>
 <script>
     window.alert   = (msg)             => UIAlert(msg);
     window.confirm = (msg)             => UIConfirm(msg);
     window.prompt  = (msg, defaultVal) => UIPrompt(msg, { defaultValue: defaultVal });
 </script>
-<script src="moderation.js"></script>
 </body>
 </html>
